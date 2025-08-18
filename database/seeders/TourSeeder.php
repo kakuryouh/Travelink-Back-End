@@ -36,13 +36,16 @@ class TourSeeder extends Seeder
                 'tour_duration' => 8, // Duration in hours
                 'tour_start_time' => '08:30:00',
                 'tour_period_id' => $dayphase->id,
-                'tour_rating' => 0,
+                'tour_rating' => 0.00,
                 'tour_review_count' => 0,
                 'tour_booking_count' => 0,
                 'tour_max_participants' => 10,
                 'tour_min_participants' => 1,
+                'tour_status' => 'published',
                 'featured' => false,
             ]);
+
+            $guide->increment('total_tours');
         }
     }
 }

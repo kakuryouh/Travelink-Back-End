@@ -2,13 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Guide extends Model
+class Guide extends Authenticatable
 {
+    use HasFactory, Notifiable;
 
     protected $table = 'guides'; // specify the table name if it doesn't follow Laravel's naming convention
     
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+
     protected $fillable = [
         'name',
         'email',
@@ -17,9 +27,19 @@ class Guide extends Model
         'phone_number',
         'country_id',
         'profile_picture',
-        'About',
+        'about',
         'password',
     ]; // specify the fillable attributes for mass assignment
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
 
     public function languages()

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Guide;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,43 +14,36 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RegisteredUserController extends Controller
+class RegisteredGuideController extends Controller
 {
-    /**
-     * Show the registration page.
-     */
-    public function create(): Response
+    public function create(): response
     {
-        return Inertia::render('auth/login');
+        return Inertia::render('auth/GuideAuth');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function store(Request $request): RedirectResponse
     {
-        // dd($request);
-        $request->validate([
+
+        $credential = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:255|unique:'.Guide::class,
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $user = User::create([
+        $guide = Guide::create([
             'name' => $request->name,
             'email' => $request->email,
             'email_verified_at' => now(),
             'password' => Hash::make($request->password),
             'phone_country_code_id' => null,
-            'language_id' => null,
+            'country_id' => null,
+
         ]);
 
-        event(new Registered($user));
+        event(new Registered($guide));
 
-        Auth::guard('web')->login($user);
+        Auth::guard('guides')->login($guide);
 
-        return redirect()->intended(route('dashboard.view', absolute: false));
+        return redirect()->intended(route('guide.dashboard'));
     }
 }

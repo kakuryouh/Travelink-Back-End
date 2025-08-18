@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Tour extends Model
 {
+    use SoftDeletes;
 
     protected $table = 'tours'; // specify the table name if it doesn't follow Laravel's naming convention
 
     protected $fillable = [
-        'tour_name',
+        'name',
         'tour_location_id',
+        'tour_meeting_point_id',
         'tour_description',
         'tour_guide_id',
         'tour_price',
@@ -22,6 +25,9 @@ class Tour extends Model
         'tour_period_id',
         'tour_max_participants',
         'tour_min_participants',
+        'tour_status',
+        'tour_rating',
+        'featured',
     ]; // specify the fillable attributes for mass assignment
 
     // Get tour location
@@ -63,9 +69,9 @@ class Tour extends Model
     public function items()
     {
         return $this->belongsToMany(Item::class, 'tour_items')
-                    ->withPivot('is_included') // 1. Tell Eloquent to fetch this column
+                    ->withPivot('is_included')
                     ->withTimestamps()
-                    ->using(TourItem::class); // 2. Tell it to use your custom pivot model
+                    ->using(TourItem::class);
     }
 
     public function guide()
@@ -88,13 +94,8 @@ class Tour extends Model
         return $this->hasMany(Transaction::class, 'tour_id'); // every tour can have many transactions
     }
 
-   protected $appends = ['slug'];
+    protected $appends = ['slug'];
 
-    // ... your relationships ...
-
-    /**
-     * Get the tour's URL-friendly slug using traditional accessor syntax.
-     */
     public function getSlugAttribute(): string
     {
         return Str::slug($this->tour_name);

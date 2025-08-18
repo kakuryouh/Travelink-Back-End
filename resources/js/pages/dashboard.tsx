@@ -120,6 +120,7 @@ interface FeaturedGuides{
     name: string;
     rating: number;
     review: number;
+    total_tours: number;
     profile_picture: string;
 }
 
@@ -176,7 +177,7 @@ interface Transactions{
   payment_method: PaymentMethod;
   payment_status: string;
   total_amount: number;
-  Booking: booking;
+  booking: booking;
 }
 
 interface Props{
@@ -337,7 +338,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
   today.setHours(0, 0, 0, 0); // Normalize to the start of today for accurate comparison
 
   // Split transaction record by date
-  const upcomingTours = transactions.filter(t => new Date(t.tour_date) >= today);
+  const upcomingTours = transactions.filter(t => new Date(t.tour_date) >= today && t.booking.booking_status != "canceled");
 
   return (
     <Box minH="100vh" bg={overallBg} position="relative" animation={`${fadeIn} 0.5s ease-out`}>
@@ -731,7 +732,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                             <StarRatingDisplayIcon key={i} boxSize={3.5} color={i < Math.floor(guide.rating) ? "yellow.400" : useColorModeValue("gray.300", "gray.600")} />
                           ))}
                           <Text fontWeight="semibold" color={primaryTextColor} fontSize="xs" ml={1}>{guide.rating.toFixed(1)}</Text>
-                          <Text fontSize="2xs" color={secondaryTextColor}>({guide.review} tours)</Text>
+                          <Text fontSize="2xs" color={secondaryTextColor}>({guide.total_tours} tours)</Text>
                         </HStack>
                       </Box>
                       {/* <IconButton variant="ghost" colorScheme="blue" size="sm" onClick={(e) => { e.stopPropagation(); navigateTo(`/guides/${guide.id}/profile`); }} aria-label={`View profile of ${guide.name}`} icon={<ArrowForwardIcon boxSize={4.5} />} /> */}

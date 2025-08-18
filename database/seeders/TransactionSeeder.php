@@ -100,6 +100,7 @@ class TransactionSeeder extends Seeder
                     $bookingData['tour_reviewed']  = true;
                     $bookingData['guide_reviewed'] = true;
                     
+                    
                     TourReview::Create([
                         'transaction_id' => $transaction->id,
                         'tour_id' => $transaction->tour_id,
@@ -115,6 +116,19 @@ class TransactionSeeder extends Seeder
                         'rating' => 4,
                         'comment' => 'This is a test comment for guide',
                     ]);
+
+                    // Tour Review
+                    $tourRating = $tour->reviews()->avg('rating');
+
+                    $tour->increment('tour_review_count');
+                    $tour->update(['tour_rating' => $tourRating]);
+
+                    // Guide Review
+                    $guideRating = $guide->reviews()->avg('rating');
+
+                    $guide->increment('review');
+                    $guide->update(['rating' => $guideRating]);
+
 
                 }else{
                     $bookingData['booking_status'] = 'completed';

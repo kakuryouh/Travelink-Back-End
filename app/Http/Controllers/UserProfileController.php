@@ -29,8 +29,8 @@ class UserProfileController extends Controller
             'language_id' => 'nullable|exists:languages,id',
         ]);
 
-        $request->user()->fill($data);
-        $request->user()->save();
+        $user->fill($data);
+        $user->save();
 
         return redirect()->route('Profile.view');
     }
@@ -49,7 +49,7 @@ class UserProfileController extends Controller
         }
 
         // Store the new photo and get its path
-        $path = $request->file('photo')->store('profile-photos', 'public');
+        $path = $request->file('photo')->store('user-profile-photos', 'public');
 
         // Update the user record with the new path
         $user->update(['profile_photo_path' => $path]);

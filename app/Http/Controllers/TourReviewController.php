@@ -44,8 +44,14 @@ class TourReviewController extends Controller
         if($TourReview){
 
             $transaction->booking->update(['tour_reviewed' => true]);
+            $tour = $transaction->tour;
 
-            return back()->with('success', 'Tour Review Posted!');                
+            $rating = $tour->reviews()->avg('rating');
+
+            $tour->increment('tour_review_count');
+            $tour->update(['tour_rating' => $rating]);
+
+            return back()->with('success', 'Tour Review Posted!');
 
         }else{
 

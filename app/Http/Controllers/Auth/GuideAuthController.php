@@ -3,30 +3,27 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-// use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Auth\LoginRequest;
+use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Inertia\Response;
+use App\Models\Guide;
 
-class AuthenticatedSessionController extends Controller
+class GuideAuthController extends Controller
 {
-    /**
-     * Show the login page.
-     */
-    public function create(Request $request): Response
+
+    public function create(): response
     {
-        return Inertia::render('auth/login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => $request->session()->get('status'),
-        ]);
+        if(Auth::guard('guides')->User()){
+            return redirect()->route('guide.dashboard');
+        }
+
+        return Inertia::render('auth/GuideAuth');
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(Request $request): RedirectResponse
     {
 
@@ -35,14 +32,14 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required'],
         ]);
 
-        if(Auth::guard('web')->attempt($credential)){
+        if(Auth::guard('guides')->attempt($credential)){
 
             $request->session()->regenerate();
 
-            $intendedURL = session()->pull('url.intended', route('dashboard.view'));
+            $intendedURL = session()->pull('url.intended', route('guide.dashboard'));
 
-            if(str_starts_with(parse_url($intendedURL, PHP_URL_PATH), '/guide')){
-                return redirect()->route('dashboard.view');
+            if(!str_starts_with(parse_url($intendedURL, PHP_URL_PATH), '/guide')){
+                return redirect()->route('guide.dashboard');
             }
 
             return redirect($intendedURL);
@@ -51,15 +48,12 @@ class AuthenticatedSessionController extends Controller
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
-
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        
+        Auth::guard('guides')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

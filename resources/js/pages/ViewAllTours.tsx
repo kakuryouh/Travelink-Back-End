@@ -140,6 +140,7 @@ export default function ViewAllTours({ user, tours }: Props){
     const primaryTextColor = useColorModeValue('gray.700', 'whiteAlpha.900');
     const secondaryTextColor = useColorModeValue('gray.500', 'gray.400');
     const subtleBorderColor = useColorModeValue('gray.200', 'gray.700');
+    const reviewAndRatingBg = useColorModeValue("whiteAlpha.800", "blackAlpha.600");
     const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${useColorModeValue('blue.500', 'blue.400')})`;
 
     const filterTours = useCallback(() => {
@@ -412,7 +413,7 @@ export default function ViewAllTours({ user, tours }: Props){
                                             Featured
                                         </Badge>
                                     )}
-                                    <Flex position="absolute" bottom={3} right={3} bg={useColorModeValue("whiteAlpha.800", "blackAlpha.600")} backdropFilter="blur(5px)" px={2.5} py={1} borderRadius="lg" alignItems="center" boxShadow="md">
+                                    <Flex position="absolute" bottom={3} right={3} bg={reviewAndRatingBg} backdropFilter="blur(5px)" px={2.5} py={1} borderRadius="lg" alignItems="center" boxShadow="md">
                                         <Icon as={StarIcon} color="yellow.400" boxSize={4} mr={1.5} />
                                         <Text fontWeight="bold" color={primaryTextColor} fontSize="sm">{tour.tour_rating.toFixed(1)}</Text>
                                         <Text fontSize="xs" color={secondaryTextColor} ml={1}>({tour.tour_review_count})</Text>
@@ -426,13 +427,11 @@ export default function ViewAllTours({ user, tours }: Props){
                                         <Text fontSize="xs" color={secondaryTextColor}>{tour.tour_duration} Hours</Text>
                                     </HStack>
 
-                                    <Link href='/tours/${tour.id}'>
-                                        <LinkOverlay>
-                                            <Heading size="md" color={primaryTextColor} fontWeight="bold" noOfLines={2} minH="3em" mb={2} _hover={{ color: primaryColor }} transition="color 0.2s">
-                                                {tour.name}
-                                            </Heading>
-                                        </LinkOverlay>                                    
-                                    </Link>
+                                    <LinkOverlay as={Link} href='/tours/${tour.id}'>
+                                        <Heading size="md" color={primaryTextColor} fontWeight="bold" noOfLines={2} minH="3em" mb={2} _hover={{ color: primaryColor }} transition="color 0.2s">
+                                            {tour.name}
+                                        </Heading>
+                                    </LinkOverlay>                       
 
                                     <Text color={secondaryTextColor} mb={4} fontSize="sm" lineHeight="1.55" noOfLines={3} minH="4.65em">
                                         {tour.tour_description}

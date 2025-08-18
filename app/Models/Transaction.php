@@ -87,7 +87,7 @@ class Transaction extends Model
 
     public function tour()
     {
-        return $this->belongsTo(Tour::class, 'tour_id');
+        return $this->belongsTo(Tour::class, 'tour_id')->withTrashed();
     }
 
     public function paymentMethod()

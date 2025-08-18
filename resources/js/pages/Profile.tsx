@@ -66,14 +66,6 @@ interface SelectField extends BaseField {
 type FormField = InputField | SelectField;
 
 
-// // Define the type for the objects in your array
-// interface FormField {
-//     label: string;
-//     name: FormFieldKey; // Use the key type here
-//     type: string;
-//     iconAs: React.ElementType;
-// }
-
 interface Language {
   id: number;
   name: string;
@@ -323,17 +315,17 @@ export default function Profile({ user, languages }: Props) {
                   onClick={isEditing ? () => photoInput.current?.click() : undefined}
               />
 
-                {/* 6. Create the hidden file input */}
-                <input
-                    type="file"
-                    style={{ display: "none"}}
-                    ref={photoInput}
-                    onChange={handlePhotoChange}
-                    accept="image/*"
-                />
+              {/* 6. Create the hidden file input */}
+              <input
+                  type="file"
+                  style={{ display: "none"}}
+                  ref={photoInput}
+                  onChange={handlePhotoChange}
+                  accept="image/*"
+              />
 
-                {/* Display any upload errors */}
-                {photoErrors.photo && <p style={{ color: 'red' }}>{photoErrors.photo}</p>}
+              {/* Display any upload errors */}
+              {photoErrors.photo && <p style={{ color: 'red' }}>{photoErrors.photo}</p>}
 
             </VStack>
             <Box flex={1} textAlign={{ base: 'center', md: 'left' }}>

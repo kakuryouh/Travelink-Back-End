@@ -19,14 +19,15 @@ return new class extends Migration
             $table->string('tour_description', 500);
             $table->foreignId('tour_guide_id')->constrained('guides')->onDelete('cascade');
             $table->integer('tour_price');
-            $table->integer('tour_duration'); // Duration in hours
+            $table->integer('tour_duration');
             $table->timestamp('tour_start_time');
             $table->foreignId('tour_period_id')->constrained('day_phases')->onDelete('cascade');
-            $table->decimal('tour_rating', 3, 2)->default(0);
+            $table->float('tour_rating')->default(0);
             $table->integer('tour_review_count')->default(0);
             $table->integer('tour_booking_count')->default(0);
             $table->integer('tour_max_participants')->default(1);
             $table->integer('tour_min_participants')->default(1);
+            $table->string('tour_status')->default('draft');
             $table->boolean('featured')->default(false);
             $table->timestamps();
         });

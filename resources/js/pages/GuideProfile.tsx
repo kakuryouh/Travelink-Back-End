@@ -111,7 +111,7 @@ interface Guide{
   rating: number;
   review: number;
   profile_picture: string;
-  About: string;
+  about: string;
   experience_years: number;
   languages: Languages;
   country: Country;
@@ -127,7 +127,7 @@ interface Props{
 export default function GuideProfile({ user, guide }: Props){
 
   // Don't Enable unless you are trying to debug data passing!
-  console.log("PROPS RECEIVED FROM LARAVEL:", {guide});
+  // console.log("PROPS RECEIVED FROM LARAVEL:", {guide});
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -245,7 +245,7 @@ export default function GuideProfile({ user, guide }: Props){
         <Box bg={cardBg} p={{ base: 5, md: 8 }} borderRadius="xl" boxShadow="xl" mb={10} borderTop="4px solid" borderColor={primaryColor} animation={`${slideInUp} 0.6s ease-out`}>
           <Flex direction={{ base: 'column', md: 'row' }} align={{ base: 'center', md: 'flex-start' }} gap={{ base: 5, md: 8 }}>
             <VStack spacing={3} align={{ base: "center", md: "flex-start" }}>
-              <Avatar size="xl" name={guide.name} src={guide.profile_picture? guide.profile_picture : `https://ui-avatars.com/api/?name=${guide.profile_picture}`} border="4px solid" borderColor={useColorModeValue('white', 'gray.700')} boxShadow={`0 0 12px ${useColorModeValue(primaryColor, 'blue.300')}`} />
+              <Avatar size="xl" name={guide.name} src={guide.profile_picture? `/storage/${guide.profile_picture}` : `https://ui-avatars.com/api/?name=${guide.profile_picture}`} border="4px solid" borderColor={useColorModeValue('white', 'gray.700')} boxShadow={`0 0 12px ${useColorModeValue(primaryColor, 'blue.300')}`} />
             </VStack>
             <Box flex={1} textAlign={{ base: 'center', md: 'left' }}>
               <Heading size="xl" color={primaryTextColor} fontWeight="bold" mb={1.5}>
@@ -267,7 +267,7 @@ export default function GuideProfile({ user, guide }: Props){
                   </HStack>
                   <HStack bg={useColorModeValue('gray.50', 'gray.700')} p={2.5} borderRadius="md" borderLeft="3px solid" borderColor={primaryColor}>
                     <Icon as={TimeIcon} color={primaryColor} boxSize={4}/>
-                    <Text fontSize="sm" color={secondaryTextColor}><Text as="span" fontWeight="medium" color={primaryTextColor}>Experience:</Text> {guide.experience_years}</Text>
+                    <Text fontSize="sm" color={secondaryTextColor}><Text as="span" fontWeight="medium" color={primaryTextColor}>Experience:</Text> {guide.experience_years} Years</Text>
                   </HStack>
               </Grid>
             </Box>
@@ -279,7 +279,7 @@ export default function GuideProfile({ user, guide }: Props){
             About {guide.name.split(' ')[0]}
           </Heading>
           <Text color={primaryTextColor} lineHeight="1.8" mb={5} fontSize="md">
-            {guide.About}
+            {guide.about}
           </Text>
           <Heading size="md" color={primaryTextColor} mb={3} mt={6}>
             Specialties

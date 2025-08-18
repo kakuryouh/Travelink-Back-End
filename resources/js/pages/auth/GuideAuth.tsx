@@ -1,95 +1,57 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import React, { useState, FormEvent, ChangeEvent } from 'react';
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  FormControl,
+  FormLabel,
+  Input,
+  Button,
+  useColorModeValue,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  VStack,
+  useToast,
+  Link as ChakraLink,
+  Icon,
+  HStack,
+  InputGroup,
+  InputRightElement,
+  IconButton
+} from '@chakra-ui/react';
 // import { useNavigate } from 'react-router-dom';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { Link, router, useForm } from '@inertiajs/react';
+import { FiEye, FiEyeOff, FiTrendingUp, FiCalendar, FiHeart } from 'react-icons/fi';
 
-interface Destination {
-  name: string;
-  image: string;
-  description: string;
-}
-
-const destinations: Destination[] = [
-  {
-    name: 'Bali',
-    image: 'https://images.unsplash.com/photo-1573790387438-4da905039392',
-    description: 'Experience the magic of Bali with our trusted guides'
-  },
-  {
-    name: 'Lombok',
-    image: 'https://images.unsplash.com/photo-1606152536277-5aa1fd33e150',
-    description: 'Discover pristine beaches and breathtaking landscapes'
-  },
-  {
-    name: 'Raja Ampat',
-    image: 'https://images.unsplash.com/photo-1516690561799-46d8f74f9abf',
-    description: 'Explore the underwater paradise of Indonesia'
-  },
-  {
-    name: 'Borobudur Temple',
-    image: 'https://images.unsplash.com/photo-1580655653885-65763b2597d0',
-    description: 'Visit ancient temples and experience cultural wonders'
-  },
-];
+// Komponen kecil untuk menampilkan poin keuntungan
+const BenefitItem = ({ icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
+  <HStack align="start" spacing={4}>
+    <Icon as={icon} boxSize={8} color="cyan.300" mt={1} />
+    <Box>
+      <Text fontWeight="bold" color="white" fontSize="lg">{title}</Text>
+      <Text fontSize="md" color="whiteAlpha.800">{children}</Text>
+    </Box>
+  </HStack>
+);
 
 const BASE_INPUT_BORDER_COLOR = '#dee2e6';
 const FOCUSED_INPUT_BORDER_COLOR = '#007bff';
 
-export default function Login() {
+export default function GuideAuth(){
 
-  // Form hook for login
-  const { data: logindata, setData: setLoginData, post: postLogin, processing: loginProcessing, errors: loginErrors} = useForm({
-    email: '',
-    password: '',
-    remember: false,
-  });
-
-  // Form hook for signup
-  const { data: registerData, setData: setRegisterData, post: postRegister, processing: registerProcessing, errors: registerErrors } = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-  });
-
-  const [activeTab, setActiveTab] = useState<'login' | 'signup' | 'reset'>('login');
-  const [currentDestination, setCurrentDestination] = useState(0);
+  // const navigate = useNavigate();
+  const toast = useToast();
+  // const [activeTab, setActiveTab] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState<'login' | 'signup' | 'reset'>('login');
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
-  const [isHoveringSocialGoogle, setIsHoveringSocialGoogle] = useState(false);
-  const [isHoveringSocialFacebook, setIsHoveringSocialFacebook] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isHoveringGuideLogin, setIsHoveringGuideLogin] = useState(false);
-
-
-  // This useEffect can be kept if you need to reset the form on component unmount
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDestination((prev) => (prev + 1) % destinations.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
   
-  const loginSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    postLogin(route('login'));
-  };
-
-  const registerSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    postRegister(route('register'));
-  };
-
-  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 768;
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -144,113 +106,111 @@ export default function Login() {
       transform: 'translateY(-1px)',
   };
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: 'Login Successful',
+      description: "Welcome back, Guide!",
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+    // navigate('/guide/dashboard');
+  };
+
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: 'Account Created',
+      description: "Your guide account has been created. Please sign in.",
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+  // Form hook for login
+  const { data: logindata, setData: setLoginData, post: postLogin, processing: loginProcessing, errors: loginErrors} = useForm({
+    email: '',
+    password: '',
+    remember: false,
+  });
+
+  // Form hook for signup
+  const { data: registerData, setData: setRegisterData, post: postRegister, processing: registerProcessing, errors: registerErrors } = useForm({
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  });
+
+  const loginSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    postLogin(route('guide.login'));
+  };
+
+  const registerSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    postRegister(route('guide.register'));
+  };
+  
+  const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 768;
+
+  const formBg = useColorModeValue('white', 'gray.700');
+  const textColor = useColorModeValue('gray.600', 'gray.400');
+  const inputBg = useColorModeValue('gray.100', 'gray.800');
+  const tabBorderColor = useColorModeValue('gray.200', 'gray.600');
+  const tabSelectedColor = useColorModeValue('blue.500', 'blue.300');
 
   return (
-    <div style={{
-      display: 'flex',
-      minHeight: '100vh',
-      backgroundColor: '#eef2f9',
-      fontFamily: '"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'
-    }}>
-      <div style={{
-        display: windowWidth < 768 ? 'none' : 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        width: '55%',
-        backgroundColor: '#1a202c',
-        backgroundImage: `url('${destinations[currentDestination].image}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-        transition: 'background-image 1s ease-in-out',
-        padding: '60px',
-      }}>
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.55)', 
-          zIndex: 1,
-        }}></div>
-
-        <div style={{ 
-          position: 'relative',
-          zIndex: 2,
-          color: 'white'
-        }}>
-          <div style={{ marginBottom: '40px' }}>
-            <h1 style={{
-              fontSize: '32px',
-              marginBottom: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              fontWeight: '700',
-            }}>
-              <span style={{ marginRight: '16px', fontSize: '36px' }}>✈️</span> Travelink
-            </h1>
-            <p style={{ fontSize: '18px', opacity: 0.9 }}>Discover Indonesia with local guides</p>
-          </div>
-
-          <h2 style={{
-            fontSize: '48px',
-            marginBottom: '28px',
-            fontWeight: 'bold',
-            lineHeight: 1.3,
-            textShadow: '0 2px 5px rgba(0, 0, 0, 0.5)'
-          }}>
-            {destinations[currentDestination].description}
-          </h2>
-
-          <p style={{ fontSize: '20px', maxWidth: '550px', opacity: 0.95, lineHeight: 1.7 }}>
-            From stunning beaches to vibrant cities and ancient temples,
-            experience personalized travel adventures with knowledgeable local guides.
-          </p>
-        </div>
+    <Flex minH="100vh" direction={{ base: 'column', md: 'row' }}>
+      {/* Kolom Kiri: Visual & Motivasi */}
+      <Flex
+        w={{ base: 'full', md: '55%' }}
+        pos="relative"
+        display={{ base: 'none', md: 'flex' }}
+        alignItems="center"
+        justifyContent="center"
+      >
+        {/* Gambar Background dari Aset Lokal */}
+        <Box
+            pos="absolute"
+            top="0" left="0" right="0" bottom="0"
+            bgImage="public\guide-auth-bg.jpg" // <-- PERUBAHAN DI SINI
+            bgSize="cover"
+            bgPosition="center"
+        />
+        {/* Overlay Gelap */}
+        <Box
+            pos="absolute"
+            top="0" left="0" right="0" bottom="0"
+            bg="blackAlpha.700"
+        />
         
-        <div style={{ position: 'relative', zIndex: 2, marginTop: 'auto' }}>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                marginBottom: '20px',
-            }}>
-            {destinations.map((_, index) => (
-                <div
-                key={index}
-                style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    backgroundColor: index === currentDestination ? "white" : "rgba(255, 255, 255, 0.4)",
-                    margin: '0 5px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.3s ease, transform 0.3s ease',
-                    transform: index === currentDestination ? 'scale(1.2)' : 'scale(1)',
-                }}
-                onClick={() => setCurrentDestination(index)}
-                ></div>
-            ))}
-            </div>
-            <div style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            padding: '10px 18px',
-            borderRadius: '8px',
-            textAlign: 'center',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            }}>
-            <p style={{
-              fontSize: '16px',
-              margin: 0,
-              color: '#FFFFFF', 
-              fontWeight: '600', 
-              textShadow: '0 1px 3px rgba(0,0,0,0.3)',
-            }}>
-                📍 {destinations[currentDestination].name}, Indonesia
-            </p>
-            </div>
-        </div>
-      </div>
+        {/* Konten Teks di atas overlay */}
+        <VStack spacing={10} p={{ base: 8, md: 16 }} zIndex={1} maxW="container.sm">
+           <Box textAlign="center">
+              <Heading size="2xl" fontWeight="bold" color="white" textShadow="0 2px 4px rgba(0,0,0,0.5)">
+                Become a Guide, Create Experiences.
+              </Heading>
+              <Text fontSize="lg" mt={4} color="whiteAlpha.900" textShadow="0 1px 3px rgba(0,0,0,0.5)">
+                Join the best community of local guides in Indonesia and start sharing the beauty of your region with the world.
+              </Text>
+           </Box>
+
+          <VStack spacing={8} align="start" w="full">
+            <BenefitItem icon={FiTrendingUp} title="Earn Extra Income">
+              Turn your local knowledge and expertise into a promising source of income.
+            </BenefitItem>
+            <BenefitItem icon={FiCalendar} title="Flexible Schedule">
+              You decide when and how often you want to lead a tour.
+            </BenefitItem>
+            <BenefitItem icon={FiHeart} title="Share Your Passion">
+              Do what you love and meet new people from all over the world.
+            </BenefitItem>
+          </VStack>
+        </VStack>
+      </Flex>
 
       {/* Authentication Form */}
       <div style={{
@@ -470,7 +430,7 @@ export default function Login() {
                     {/* Password Error Message */}
                     {registerErrors.password && <p style={{ color: 'red' }}>{registerErrors.password}</p>}
 
-                       <button
+                        <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
@@ -573,17 +533,139 @@ export default function Login() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <Link href={route('guide.login')}>
+            <Link href={route('login')}>
               <button
                 style={isHoveringGuideLogin ? {...guideButtonStyle, ...guideButtonHoverStyle} : guideButtonStyle}
                 onMouseEnter={() => setIsHoveringGuideLogin(true)}
                 onMouseLeave={() => setIsHoveringGuideLogin(false)}
               >
-                Guide Login / Sign Up
+                User Login / Sign Up
               </button>
             </Link>
 
           </div>
+
+          {/* Reset Password Form */}
+          {/* {activeTab === 'reset' && (
+            <form onSubmit={handleReset}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <p style={{ color: '#495057', lineHeight: '1.6', fontSize: '15px', textAlign: 'center' }}>
+                  Enter the email address associated with your account, and we'll send you a link to reset your password.
+                </p>
+                <div>
+                  <label style={{ fontWeight: '500', marginBottom: '8px', display: 'block', color: '#343a40' }}>
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                    style={inputStyle}
+                    onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.currentTarget.style.borderColor = FOCUSED_INPUT_BORDER_COLOR}
+                    onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.currentTarget.style.borderColor = BASE_INPUT_BORDER_COLOR}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  style={isHoveringSubmit ? {...primaryButtonStyle, ...primaryButtonHoverStyle} : primaryButtonStyle}
+                  onMouseEnter={() => setIsHoveringSubmit(true)}
+                  onMouseLeave={() => setIsHoveringSubmit(false)}
+                  disabled={loading}
+                >
+                  {loading ? "Sending Link..." : "Send Reset Link"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('login')}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: '#007bff',
+                    padding: '10px',
+                    border: '1px solid #007bff',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    alignSelf: 'center',
+                    width: 'auto',
+                    marginTop: '8px',
+                    transition: 'all 0.2s ease',
+                  }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+                        e.currentTarget.style.borderColor = '#0056b3';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.borderColor = '#007bff';
+                    }}
+                >
+                  Back to Login
+                </button>
+              </div>
+            </form>
+          )}
+
+          {activeTab !== 'reset' && (
+            <>
+              <div style={{
+                position: 'relative',
+                margin: '32px 0',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  height: '1px',
+                  backgroundColor: '#dee2e6',
+                }}></div>
+                <div style={{
+                  position: 'absolute',
+                  top: '-11px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: 'white',
+                  padding: '0 16px'
+                }}>
+                  <span style={{
+                    color: '#6c757d',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    textTransform: 'uppercase',
+                  }}>
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { provider: 'Google', color: '#DB4437', hoverColor: '#C33D2E', icon: 'G', stateSetter: setIsHoveringSocialGoogle, isHovering: isHoveringSocialGoogle },
+                  { provider: 'Facebook', color: '#4267B2', hoverColor: '#365899', icon: 'f', stateSetter: setIsHoveringSocialFacebook, isHovering: isHoveringSocialFacebook },
+                ].map(({ provider, color, hoverColor, icon, stateSetter, isHovering }) => (
+                  <button
+                    key={provider}
+                    type="button"
+                    onClick={() => handleSocialLogin(provider)}
+                    style={{
+                      ...buttonBaseStyle,
+                      backgroundColor: isHovering ? hoverColor : color,
+                      color: 'white',
+                      marginTop: '0',
+                      ...(isHovering && { boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)', transform: 'translateY(-1px)'}),
+                    }}
+                    onMouseEnter={() => stateSetter(true)}
+                    onMouseLeave={() => stateSetter(false)}
+                    disabled={loading}
+                  >
+                    <span style={{ fontSize: '18px', width: '20px', textAlign: 'center' }}>{icon}</span>
+                    Sign in with {provider}
+                  </button>
+                ))}
+                </div>
+            </>
+          )} */}
 
           <div style={{
             marginTop: '32px',
@@ -603,6 +685,13 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
+    </Flex>
   );
+
 };
+
+            {/* <Link href={route('login')}>
+              <ChakraLink color="blue.500" fontWeight="semibold">
+                Go to Traveler Sign In
+              </ChakraLink>            
+            </Link> */}

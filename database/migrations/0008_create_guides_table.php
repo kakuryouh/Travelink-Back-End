@@ -16,13 +16,14 @@ return new class extends Migration
             $table->string('name', 100);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->foreignId('phone_country_code_id')->constrained('phone_country_codes')->onDelete('cascade');
+            $table->foreignId('phone_country_code_id')->nullable()->constrained('phone_country_codes')->onDelete('set null');
             $table->string('phone_number', 15)->nullable();
-            $table->foreignId('country_id')->constrained('countries')->onDelete('cascade');
-            $table->decimal('rating', 3, 2)->default(0.00);
+            $table->foreignId('country_id')->nullable()->constrained('countries')->onDelete('set null');
+            $table->float('rating')->default(0);
             $table->integer('review')->default(0);
+            $table->integer('total_tours')->default(0);
             $table->string('profile_picture')->nullable();
-            $table->string('About', 500)->nullable();
+            $table->string('about', 500)->nullable();
             $table->integer('experience_years')->default(0);
             $table->string('password');
             $table->rememberToken();

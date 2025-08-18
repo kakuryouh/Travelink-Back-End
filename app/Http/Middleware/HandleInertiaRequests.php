@@ -6,6 +6,7 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -50,7 +51,15 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
+
                 'user' => $request->user(),
+
+                'guide' => Auth::guard('guides')->check() ? [
+                    'id' => Auth::guard('guides')->user()->id,
+                    'name' => Auth::guard('guides')->user()->name,
+                    'profile_picture' => Auth::guard('guides')->user()->profile_picture, // Or your avatar attribute
+
+                ] : null,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

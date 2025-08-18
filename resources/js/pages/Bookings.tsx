@@ -156,6 +156,7 @@ interface booking{
   booking_status: string;
   tour_reviewed: boolean;
   guide_reviewed: boolean;
+  cancelation_reason: string;
 }
 
 interface TransactionTour{
@@ -207,16 +208,17 @@ export default function Bookings( { user, transactions, flash} : Props ){
   today.setHours(0, 0, 0, 0);
 
   // Split transaction record by date
-  const upcomingTours = transactions.filter(t => new Date(t.tour_date) >= today);
-  const pastTours = transactions.filter(t => new Date(t.tour_date) < today);
+  const upcomingTours = transactions.filter(t => new Date(t.tour_date) >= today && t.booking.booking_status != "canceled");
+  const pastTours = transactions.filter(t => new Date(t.tour_date) < today && t.booking.booking_status != "canceled");
+  const canceledTours = transactions.filter(t => t.booking.booking_status == "canceled");
 
   const toast = useToast();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [bookingToCancel, setbookingToCancel] = useState<any>(null);
   const [currentRating, setCurrentRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [reviewText, setReviewText] = useState('');
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -229,6 +231,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
   const infoBoxBg = useColorModeValue('gray.50', 'gray.700');
   const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${primaryColor})`;
   const yellowStarColor = useColorModeValue('yellow.400', 'yellow.300');
+  const grayStarColor = useColorModeValue("gray.300", "gray.600");
 
   const baseButtonStyle = {
     borderRadius: "lg", fontWeight: "semibold", h: "42px", px: 5, fontSize: "md",
@@ -237,32 +240,6 @@ export default function Bookings( { user, transactions, flash} : Props ){
     _focus: { boxShadow: `0 0 0 3px ${useColorModeValue('blue.200', 'blue.700')}` }
   };
 
-  const primaryNavButtonStyle = {
-      ...baseButtonStyle,
-      bgGradient: `linear(to-r, ${primaryColor}, ${useColorModeValue('blue.400', 'blue.300')})`,
-      color: 'white',
-      boxShadow: "md",
-      _hover: {
-          bgGradient: `linear(to-r, ${primaryHoverColor}, ${useColorModeValue('blue.500', 'blue.400')})`,
-          transform: 'translateY(-2px) scale(1.02)',
-          boxShadow: 'lg'
-      },
-  };
-  
-  const secondaryNavButtonStyle = {
-      ...baseButtonStyle,
-      bg: 'transparent',
-      color: primaryColor,
-      border: "2px solid",
-      borderColor: primaryColor,
-      _hover: {
-          bg: useColorModeValue('blue.50', 'rgba(49,130,206,0.1)'),
-          borderColor: primaryHoverColor,
-          color: primaryHoverColor,
-          transform: 'translateY(-2px) scale(1.02)',
-          boxShadow: 'md'
-      },
-  };
 
   const primaryButtonStyle = {
     ...baseButtonStyle, bgGradient: `linear(to-r, ${primaryColor}, ${useColorModeValue('blue.400', 'blue.300')})`, color: 'white',
@@ -327,12 +304,25 @@ export default function Bookings( { user, transactions, flash} : Props ){
   
   const handleOpenReviewModal = (booking: any) => {
     setSelectedBooking(booking);
-    setData({
+    setbookingToCancel(null);
+    setReviewData({
       transaction_id: booking.id,
       rating: 0,
       review: '',
     });
     setHoverRating(0);
+    onOpen();
+  };
+
+  const handleOpenCancelBooking = (booking: any) => {
+    setbookingToCancel(booking);
+    setSelectedBooking(null);
+    setCancelationData({
+      transactionID: booking.id,
+      bookingID: booking.booking.id,
+      Booking_status: booking.booking.booking_status,
+      cancelation_reason: '',
+    });
     onOpen();
   };
 
@@ -362,27 +352,62 @@ export default function Bookings( { user, transactions, flash} : Props ){
     }
   }, [flash]);
 
-  const {data, setData, post, processing, errors} = useForm({
+  const {data: reviewData, setData: setReviewData, post: postReview, processing: ProcessingReview, errors: ReviewErrors} = useForm({
     transaction_id: null,
     rating: 0,
     review: '',
+  });
+
+  const {data: cancelationData, setData: setCancelationData, post: cancelationPost, processing: CancelationProcessing, errors: cancelationErrors, reset: cancelationReset } = useForm({
+    transactionID: null,
+    bookingID: null,
+    Booking_status: '',
+    cancelation_reason: '',
   });
 
   const handleTourReviewSubmit = (e: FormEvent) =>  {
 
     e.preventDefault();
     
-    if (data.rating === 0) {
-      alert("Please select a star rating.");
+    if (reviewData.rating === 0) {
+      toast({
+        title: 'Please Select a star rating',
+        description: 'Rating cannot be empty',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
       return;
     }
 
-    post(route('TourReview.create'), {
+    postReview(route('TourReview.create'), {
       onSuccess: () => {
 
         router.get('/Bookings');
       }
     });
+  }
+
+  const handleCancelBookingSubmit = (e: FormEvent) =>  {
+
+    e.preventDefault();
+
+    if (cancelationData.cancelation_reason.trim() === '') {
+      toast({
+        title: 'Please Provide Reason For Cancelation',
+        description: 'Reason for Cancelation Cannot be Empty',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    cancelationPost(route('user.cancel.booking.submit'), {
+      onSuccess: () =>{
+        onClose();
+      }
+    })
   }
 
 
@@ -400,12 +425,12 @@ export default function Bookings( { user, transactions, flash} : Props ){
     </Box>
   );
 
-  const renderBookingCard = (booking: any, isUpcoming: boolean) => {
+  const renderBookingCard = (booking: any, isUpcoming: boolean, canceled: boolean) => {
     const daysDiff = isUpcoming ? calculateDaysDifference(booking.tour_date) : Math.floor((new Date().getTime() - new Date(booking.tour_date).getTime()) / (1000 * 60 * 60 * 24));
     let countdownText = "";
     const TransactionTourReview = booking.tour.reviews.filter((r:TourReview) => (r.transaction_id) === booking.id)
     
-    if (isUpcoming) {
+    if (isUpcoming && !canceled) {
         if (daysDiff > 0) countdownText = `${daysDiff} day${daysDiff > 1 ? 's' : ''} left`;
         else if (daysDiff === 0) countdownText = "Today!";
         else countdownText = "Tour has passed";
@@ -426,20 +451,47 @@ export default function Bookings( { user, transactions, flash} : Props ){
               src={booking.tour.images[0].image_path} alt={booking.tour.slug} objectFit="cover" w="100%" h="100%"
               filter={!isUpcoming ? "grayscale(50%)" : "none"} opacity={!isUpcoming ? "0.8" : "1"}
             />
-            <Badge
+
+            {canceled &&(
+              <Badge
               position="absolute" top={3} right={3}
-              colorScheme={booking.booking.booking_status === 'completed' ? 'green' : booking.booking.booking_status === 'pending' ? 'orange' : 'blue'}
+              colorScheme={booking.booking.booking_status === 'canceled' ? 'red' : 'gray'}
               variant="solid" px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" boxShadow="md"
-            >
+              >
               {booking.booking.booking_status}
-            </Badge>
-            <Badge
-              position="absolute" bottom={3} left={3} bg="blackAlpha.700" color="white"
-              px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold"
-              display="flex" alignItems="center"
-            >
-              <Icon as={isUpcoming ? TimeIcon : CalendarIcon} mr={1.5} /> {countdownText}
-            </Badge>
+              </Badge>
+            )}
+
+            {!canceled && isUpcoming && (
+              <Badge
+                position="absolute" top={3} right={3}
+                colorScheme={booking.booking.booking_status === 'confirmed' ? 'blue' : booking.booking.booking_status === 'pending' ? 'orange' : 'gray'}
+                variant="solid" px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" boxShadow="md"
+              >
+                {booking.booking.booking_status}
+              </Badge>
+            )}
+
+            {!canceled && !isUpcoming && (
+              <Badge
+                position="absolute" top={3} right={3}
+                colorScheme={booking.booking.booking_status === 'completed' ? 'green' : 'blue'}
+                variant="solid" px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" boxShadow="md"
+              >
+                {booking.booking.booking_status}
+              </Badge>
+            )}
+
+            {!canceled && (
+              <Badge
+                position="absolute" bottom={3} left={3} bg="blackAlpha.700" color="white"
+                px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold"
+                display="flex" alignItems="center"
+              >
+                <Icon as={isUpcoming ? TimeIcon : CalendarIcon} mr={1.5} /> {countdownText}
+              </Badge>              
+            )}
+
           </Box>
 
           <Box p={{ base: 4, md: 6 }} flex="1">
@@ -476,13 +528,20 @@ export default function Bookings( { user, transactions, flash} : Props ){
               direction={{ base: "column", sm: "row" }} gap={{ base: 4, sm: 2 }}
             >
               <Flex align="center" gap={3} mb={{base: isUpcoming && booking.payment_status === 'pending' ? 0 : 3, sm: 0}}>
-                <Box
-                  width="40px" height="40px" borderRadius="full" bgGradient={accentGradient}
-                  display="flex" alignItems="center" justifyContent="center" boxShadow="md"
-                  color="white" fontSize="lg" fontWeight="bold"
-                >
-                  {booking.guide.name.substring(0,1)}
-                </Box>
+              
+                <Link href={route('guideprofile.userview', { guide: booking.guide.id})}>
+                  <Avatar
+                    name= {booking.guide.name}
+                    src= {booking.guide.profile_picture ? `/storage/${booking.guide.profile_picture}` : `https://ui-avatars.com/api/?name=${booking.guide.name}`}
+                    boxSize="60px"
+                    border="2px solid"
+                    borderColor="transparent"
+                    _hover={{ borderColor: primaryColor, transform: 'scale(1.08)', boxShadow: 'lg' }}
+                    transition="all 0.2s ease-in-out"
+                    boxShadow="md"
+                  />              
+                </Link>
+
                 <Box>
                   <Text fontSize="sm" fontWeight="bold" color={primaryTextColor}>{booking.guide.name}</Text>
                   <Text fontSize="xs" color={secondaryTextColor}>Your Guide</Text>
@@ -490,7 +549,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
               </Flex>
 
               <Flex gap={3} wrap={{ base: "wrap", md: "nowrap" }} justify={{ base: "center", md: "flex-end" }} width={{base:"100%", sm:"auto"}}>
-                {isUpcoming && booking.payment_status === 'unpaid' && (
+                {isUpcoming && booking.payment_status === 'unpaid' && !canceled && (
                   
                   <Link href={route(`Payment.create`, {transaction: booking.id})}>
                     <Button {...successButtonStyle} leftIcon={<Icon as={CheckCircleIcon} />} flexGrow={{base:1, sm:0}}>
@@ -499,33 +558,36 @@ export default function Bookings( { user, transactions, flash} : Props ){
                   </Link>
                 
                 )}
-                {!isUpcoming && !booking.booking.tour_reviewed && (
+                {!isUpcoming && !booking.booking.tour_reviewed && !canceled && (
                   <Button {...warningButtonStyle} leftIcon={<Icon as={StarIcon} />} onClick={() => handleOpenReviewModal(booking)} flexGrow={{base:1, sm:0}}>
                     Leave Review
                   </Button>
                 )}
 
-                <Link href={route('tour.show', { tour: booking.tour.id, slug: booking.slug })}>
-                  <Button {...secondaryButtonStyle} flexGrow={{base:1, sm:0}}>
-                    {isUpcoming ? 'Tour Details' : 'Book Again'}
-                  </Button>                
-                </Link>
+                {!canceled &&(
+                  <Link href={route('tour.show', { tour: booking.tour.id, slug: booking.slug })}>
+                    <Button {...secondaryButtonStyle} flexGrow={{base:1, sm:0}}>
+                      {isUpcoming ? 'Tour Details' : 'Book Again'}
+                    </Button>                
+                  </Link>                  
+                )}
 
-                {isUpcoming && (
-                  <Button {...dangerButtonStyle} leftIcon={<Icon as={CloseIcon} boxSize={3}/>} onClick={() => alert(`Cancel booking ${booking.id}`)} flexGrow={{base:1, sm:0}}>
+
+                {isUpcoming && !canceled && (
+                  <Button {...dangerButtonStyle} leftIcon={<Icon as={CloseIcon} boxSize={3}/>} onClick={() => handleOpenCancelBooking(booking)} flexGrow={{base:1, sm:0}}>
                     Cancel
                   </Button>
                 )}
               </Flex>
             </Flex>
             
-            {!isUpcoming && booking.booking.tour_reviewed && (
+            {!isUpcoming && booking.booking.tour_reviewed && !canceled && (
               <Flex alignItems="center" mt={4} p={2} bg={useColorModeValue("green.50", "green.800")} borderRadius="md" borderLeft="3px solid" borderColor={useColorModeValue("green.500", "green.300")}>
                   <Icon as={CheckCircleIcon} color={useColorModeValue("green.500", "green.300")} mr={2} />
                   <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("green.700", "green.200")}>You've left a review for this tour.</Text>
               </Flex>
             )}
-            {!isUpcoming && booking.booking.tour_reviewed && (
+            {!isUpcoming && booking.booking.tour_reviewed && !canceled && (
               <Flex alignItems="center" mt={booking.booking.tour_reviewed ? 2 : 4}>
                 <Text fontSize="sm" color={secondaryTextColor} mr={2}>Your Rating:</Text>
                 {[...Array(5)].map((_, i) => (
@@ -534,6 +596,13 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 <Text fontWeight="bold" fontSize="sm" ml={1.5} color={primaryTextColor}>
                     {TransactionTourReview[0].rating}/5
                 </Text>
+              </Flex>
+            )}
+
+            {canceled && (
+              <Flex alignItems="center">
+                <Text fontSize="sm" color={secondaryTextColor} mr={2} marginTop={5}>Cancelation Reason:</Text>
+                <Text fontSize="sm" color={secondaryTextColor} mr={2} marginTop={5}>{booking.booking.cancelation_reason}</Text>
               </Flex>
             )}
           </Box>
@@ -632,11 +701,13 @@ export default function Bookings( { user, transactions, flash} : Props ){
           </Heading>
         </Flex>
 
+        {/* Tabs */}
         <Tabs index={activeTabIndex} onChange={(index) => setActiveTabIndex(index)} variant="unstyled" isLazy>
           <TabList display="flex" justifyContent="space-around" bg={cardBg} p={1.5} borderRadius="lg" boxShadow="lg" mb={8} border="1px solid" borderColor={subtleBorderColor} animation={`${slideInUp} 0.7s ease-out 0.2s both`}>
             {[
               { label: "Upcoming", icon: TimeIcon, count: upcomingTours.length },
-              { label: "Past", icon: CheckCircleIcon, count: pastTours.length }
+              { label: "Past", icon: CheckCircleIcon, count: pastTours.length },
+              { label: "Cancelled", icon: CloseIcon, count: canceledTours.length },
             ].map((tab, index) => (
               <Tab
                 key={tab.label} flex={1} py={3} borderRadius="md" fontWeight="semibold" fontSize="md"
@@ -659,7 +730,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 <EmptyState icon={InfoOutlineIcon} title="No Upcoming Adventures Yet" description="Your next journey awaits! Find incredible tours and experiences to fill this space." buttonText="Explore Tours Now"/>
               ) : (
                 <Flex direction="column" gap={8}>
-                  {upcomingTours?.map((booking) => renderBookingCard(booking, true))}
+                  {upcomingTours?.map((booking) => renderBookingCard(booking, true, false))}
                 </Flex>
               )}
             </TabPanel>
@@ -668,7 +739,16 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 <EmptyState icon={LinkIcon} title="No Past Journeys Logged" description="Once you've completed a tour, it will appear here. Let's make some memories!" buttonText="Find Your Next Tour"/>
               ) : (
                 <Flex direction="column" gap={8}>
-                  {pastTours?.map((booking) => renderBookingCard(booking, false))}
+                  {pastTours?.map((booking) => renderBookingCard(booking, false, false))}
+                </Flex>
+              )}
+            </TabPanel>
+            <TabPanel p={0}>
+              {canceledTours.length === 0 ? (
+                <EmptyState icon={LinkIcon} title="No Canceled Journeys Logged" description="Canceled tours will appear here." buttonText="Find Your Next Tour"/>
+              ) : (
+                <Flex direction="column" gap={8}>
+                  {canceledTours?.map((booking) => renderBookingCard(booking, false, true))}
                 </Flex>
               )}
             </TabPanel>
@@ -676,8 +756,8 @@ export default function Bookings( { user, transactions, flash} : Props ){
         </Tabs>
       </Container>
 
-      {/* Review Window */}
-      {selectedBooking && (
+      {/* Cancel Window */}
+      {selectedBooking && !bookingToCancel && (
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
           <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(5px)" />
           <ModalContent bg={cardBg} borderRadius="xl" boxShadow="2xl">
@@ -697,9 +777,8 @@ export default function Bookings( { user, transactions, flash} : Props ){
                           key={ratingValue}
                           as={StarIcon}
                           boxSize={{base: 8, md: 10}}
-                          color={ratingValue <= (data.rating || currentRating) ? yellowStarColor : useColorModeValue("gray.300", "gray.600")}
-                          onClick={() => setData('rating', ratingValue)}
-                          // onMouseEnter={() => setHoverRating(ratingValue)}
+                          color={ratingValue <= (reviewData.rating || currentRating) ? yellowStarColor : grayStarColor}
+                          onClick={() => setReviewData('rating', ratingValue)}
                           cursor="pointer"
                           transition="all 0.2s ease"
                           _hover={{ transform: 'scale(1.2)' }}
@@ -714,8 +793,8 @@ export default function Bookings( { user, transactions, flash} : Props ){
                     borderColor={subtleBorderColor}
                     focusBorderColor={primaryColor}
                     rows={5}
-                    value={data.review}
-                    onChange={(e) => setData('review', e.target.value)}
+                    value={reviewData.review}
+                    onChange={(e) => setReviewData('review', e.target.value)}
                   />
                 </VStack>
               </ModalBody>
@@ -723,8 +802,46 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 <Button {...secondaryButtonStyle} mr={3} onClick={onClose}>
                   Cancel
                 </Button>
-                <Button {...primaryButtonStyle} type='submit' isDisabled={data.rating === 0 || processing}>
-                  {processing ? 'Processing...' : 'Submit Review'}
+                <Button {...primaryButtonStyle} type='submit' isDisabled={reviewData.rating === 0 || ProcessingReview}>
+                  {ProcessingReview ? 'Processing...' : 'Submit Review'}
+                </Button>
+              </ModalFooter>
+            </form>
+          </ModalContent>
+        </Modal>
+      )}
+
+      {/* Review Window */}
+      {bookingToCancel && (
+        <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
+          <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(5px)" />
+          <ModalContent bg={cardBg} borderRadius="xl" boxShadow="2xl">
+            <form onSubmit={handleCancelBookingSubmit}>
+              <ModalHeader color={primaryTextColor} fontWeight="bold" borderBottomWidth="1px" borderColor={subtleBorderColor}>
+                Cancel booking for "{bookingToCancel.tour.name}"
+              </ModalHeader>
+              <ModalCloseButton _focus={{ boxShadow: 'outline' }} />
+              <ModalBody py={6}>
+                <VStack spacing={5}>
+                  <Text color={secondaryTextColor} fontWeight="medium">Cancelation Reason:</Text>
+                  
+                  <Textarea
+                    placeholder="Accidental booking Or A Change of plan"
+                    bg={infoBoxBg}
+                    borderColor={subtleBorderColor}
+                    focusBorderColor={primaryColor}
+                    rows={5}
+                    value={cancelationData.cancelation_reason}
+                    onChange={(e) => setCancelationData('cancelation_reason', e.target.value)}
+                  />
+                </VStack>
+              </ModalBody>
+              <ModalFooter borderTopWidth="1px" borderColor={subtleBorderColor}>
+                <Button {...secondaryButtonStyle} mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button {...primaryButtonStyle} type='submit' isDisabled={cancelationData.cancelation_reason === '' || CancelationProcessing}>
+                  {CancelationProcessing ? 'Processing...' : 'Confirm Cancelation'}
                 </Button>
               </ModalFooter>
             </form>

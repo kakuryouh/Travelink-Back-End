@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('booking_status')->default('pending'); // completed, pending, canceled
             $table->boolean('tour_reviewed')->default(false);
             $table->boolean('guide_reviewed')->default(false);
+            $table->string('cancelation_reason', 200)->nullable();
             $table->timestamps();
         });
     }

@@ -25,12 +25,12 @@ class TourItinerarySeeder extends Seeder
         ];
 
         $startTimes = [
-            '08:30 AM',
-            '09:30 AM',
-            '11:00 AM',
-            '12:30 PM',
-            '02:00 PM',
-            '04:30 PM',
+            '08:30:00',
+            '09:30:00',
+            '11:00:00',
+            '12:30:00',
+            '14:00:00',
+            '16:30:00',
         ];
 
         $descriptions = [

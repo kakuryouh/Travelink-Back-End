@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,7 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        Storage::disk('public')->deleteDirectory('tour_images');
+        Storage::disk('public')->makeDirectory('tour_images');
+        Storage::disk('public')->deleteDirectory('guide-profile-photos');
+        Storage::disk('public')->makeDirectory('guide-profile-photos');
+        Storage::disk('public')->deleteDirectory('user-profile-photos');
+        Storage::disk('public')->makeDirectory('user-profile-photos');
 
         $this->call([
             CountrySeeder::class,
@@ -37,7 +43,6 @@ class DatabaseSeeder extends Seeder
             TourCategorySeeder::class,
             TourTagSeeder::class,
             TransactionSeeder::class,
-            // BookingSeeder::class,
         ]);
     }
 }

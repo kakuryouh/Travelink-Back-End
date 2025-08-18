@@ -15,6 +15,7 @@ class Booking extends Model
         'booking_status',
         'tour_reviewed',
         'guide_reviewed',
+        'cancelation_reason',
     ];
     
     // Define the relationship with the User model

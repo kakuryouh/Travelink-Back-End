@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use App\Models\TourImage;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class TourImageSeeder extends Seeder
 {
@@ -24,14 +27,28 @@ class TourImageSeeder extends Seeder
 
         TourImage::truncate(); // Clear existing tour images before seeding
 
-        foreach ($images as $image) {
-            TourImage::create([
-                'tour_id' => 1,
-                'image_path' => $image,
-                'image_order' => $order, // Assuming all images have the same order for simplicity
-                'image_caption' => 'Bali_' . $order, // Assuming the tour ID is 1 for the Bali Beach Hopping Adventure
-            ]);
-            $order++;
+        foreach ($images as $url) {
+            // Download image from the internet
+            $response = Http::get($url);
+
+            if ($response->successful()) {
+                // Generate a unique file name with the original extension
+                $extension = 'jpg'; // Unsplash returns jpgs by default
+                $fileName = Str::random(20) . '.' . $extension;
+
+                // Save to public disk (storage/app/public/tour_images)
+                Storage::disk('public')->put("tour_images/{$fileName}", $response->body());
+
+                // Store DB record (relative path)
+                TourImage::create([
+                    'tour_id' => 1, // change to your tour ID logic
+                    'image_path' => "tour_images/{$fileName}",
+                    'image_caption' => 'Bali_' . $order,
+                    'image_order' => $order,
+                ]);
+
+                $order++;
+            }
         }
     }
 }
