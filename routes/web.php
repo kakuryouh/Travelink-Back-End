@@ -42,40 +42,19 @@ Route::get('/', function () {
 })->name('login');
 
 Route::middleware(['auth:web', 'verified'])->group(function () {
-    // Logout Route
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-    // Profile Routes
     Route::get('profile', [UserProfileController::class, 'view'])->name('Profile.view');
-
     Route::patch('profile', [UserProfileController::class, 'update'])->name('Profile.update');
-
     Route::post('/profile/photo', [UserProfileController::class, 'updatePhoto'])->name('profile.photo.update');
-
-    //dashboard review
     Route::get('dashboard', [DashboardController::class, 'view'])->name('dashboard.view');
-
-    //Tours Route
     Route::get('ViewAllTour', [ViewAllTourController::class, 'view'])->name('Tours.view');
-
-    Route::get('/tours/{tour}/{slug?}', [TourDetailController::class, 'show'])->name('tour.show');
-
-    // Booking Route
+    Route::get('/tours/{tour}}', [TourDetailController::class, 'show'])->name('tour.show');
     Route::get('Bookings', [BookingController::class, 'view'])->name('Bookings');
-
     Route::post('TourReview', [TourReviewController::class, 'create'])->name('TourReview.create');
-    // Route::post('GUideReview', );
-
-    //Guide profile Route
     Route::get('/GuideProfile/{guide}', [GuideProfileController::class, 'user_view'])->name('guideprofile.userview');
-
-    //Payment Route
     Route::get('/Payment/{transaction}/Payment-Details', [PaymentController::class, 'view'])->middleware('nocache')->name('Payment.create');
-
     Route::post('/transaction/create', [TransactionController::class, 'store'])->name('transaction.store');
-
     Route::post('/transaction/update', [TransactionController::class, 'update'])->name('transaction.update');
-
     Route::post('CancelBooking/submit', [CancelBookingController::Class, 'user_cancel_booking'])->name('user.cancel.booking.submit');
 });
 

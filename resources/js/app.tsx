@@ -19,7 +19,7 @@ const customTheme = extendTheme({
       200: "#8ab9ff",
       300: "#5c9dff",
       400: "#2e81ff",
-      500: "#1467e6", // primary brand color
+      500: "#1467e6",
       600: "#0d50b3",
       700: "#073a80",
       800: "#02234d",
@@ -32,43 +32,39 @@ const customTheme = extendTheme({
   },
   components: {
     Button: {
-      // Base styles for all buttons
       baseStyle: {
-        fontWeight: "600", // Corresponds to your "black" in Poppins if available, otherwise bold
+        fontWeight: "600",
         borderRadius: "md",
-        // You can add other base styles here, e.g., transition
         transitionProperty: "common",
         transitionDuration: "normal",
       },
-      // Variants
+
       variants: {
-        // Customizing the 'solid' variant
-        solid: (props: any) => ({ // props can be used for colorMode specifics if needed
-          bg: "brand.500", // Use your brand color
+        solid: () => ({ 
+          bg: "brand.500",
           color: "white",
           _hover: {
-            bg: "brand.600", // Darker brand color on hover
-            _disabled: { // Keep disabled state consistent
+            bg: "brand.600",
+            _disabled: {
               bg: "brand.500",
-              opacity: 0.6, // Add opacity for disabled state
+              opacity: 0.6,
             },
           },
           _active: {
-            bg: "brand.700", // Even darker for active state
+            bg: "brand.700",
           },
-          _disabled: { // General disabled state
+          _disabled: {
             bg: "brand.300",
             opacity: 0.6,
             cursor: "not-allowed",
           }
         }),
-        // You can define other variants like 'outline', 'ghost' here
-        // Example for 'outline':
-        outline: (props: any) => ({
+
+        outline: () => ({
           borderColor: "brand.500",
           color: "brand.500",
           _hover: {
-            bg: "brand.50", // Light brand color for hover background
+            bg: "brand.50",
             borderColor: "brand.600",
           },
           _active: {

@@ -1,12 +1,10 @@
-import React from 'react';
 import {
   Box, Button, Flex, Text, Heading, Container, Avatar, Badge,
   HStack, VStack, Icon, useColorModeValue, Tag, Wrap, WrapItem,
   Grid,
 } from '@chakra-ui/react';
 import {
-  ArrowBackIcon, ChatIcon, StarIcon, TimeIcon, InfoOutlineIcon,
-  SunIcon, MoonIcon, CheckIcon, ExternalLinkIcon, ViewIcon,
+  ChatIcon, StarIcon, TimeIcon, InfoOutlineIcon,CheckIcon, ViewIcon,
 } from '@chakra-ui/icons';
 import { keyframes } from '@emotion/react';
 import { Link } from '@inertiajs/react';
@@ -126,9 +124,6 @@ interface Props{
 
 export default function GuideProfile({ user, guide }: Props){
 
-  // Don't Enable unless you are trying to debug data passing!
-  // console.log("PROPS RECEIVED FROM LARAVEL:", {guide});
-
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
   const glassBg = useColorModeValue('rgba(255, 255, 255, 0.9)', 'rgba(26, 32, 44, 0.85)');
@@ -138,6 +133,9 @@ export default function GuideProfile({ user, guide }: Props){
   const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
   const subtleBorderColor = useColorModeValue('gray.200', 'gray.700');
   const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${useColorModeValue('blue.500', 'blue.400')})`;
+
+  const specialityColorScheme = useColorModeValue('blue', 'teal');
+  const tourBg = useColorModeValue('gray.50', 'gray.700');
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
@@ -183,7 +181,7 @@ export default function GuideProfile({ user, guide }: Props){
               return 'gray';
 
             default:
-                return 'red'; // A fallback color is always a good idea
+                return 'red';
         }
   };
 
@@ -287,7 +285,7 @@ export default function GuideProfile({ user, guide }: Props){
           <Wrap spacing={3}>
             {guide.specialities.map((specialty, index) => (
               <WrapItem key={index}>
-                <Tag size="lg" variant="subtle" colorScheme={useColorModeValue('blue', 'teal')} borderRadius="full" p={2.5} px={4}>
+                <Tag size="lg" variant="subtle" colorScheme={specialityColorScheme} borderRadius="full" p={2.5} px={4}>
                   <Icon as={CheckIcon} mr={2} boxSize={3.5}/> {specialty.name}
                 </Tag>
               </WrapItem>
@@ -303,7 +301,7 @@ export default function GuideProfile({ user, guide }: Props){
             {guide.tours.map((tour) => (
               <Box
                 key={tour.id}
-                bg={useColorModeValue('gray.50', 'gray.700')}
+                bg={tourBg}
                 p={5}
                 borderRadius="lg"
                 boxShadow="md"

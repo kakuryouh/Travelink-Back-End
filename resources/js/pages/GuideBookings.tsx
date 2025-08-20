@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'; // Impor useState
+import { useEffect } from 'react'; // Impor useState
 import {
   Box,
   Flex,
@@ -17,7 +17,7 @@ import {
   Avatar,
   Tag,
   Divider,
-  useToast // Impor useToast
+  useToast,
 } from '@chakra-ui/react';
 import { FiCalendar, FiCheckCircle, FiXCircle, FiClock, FiUsers } from 'react-icons/fi';
 import GuideLayout from '../layouts/GuideLayout';
@@ -83,13 +83,10 @@ interface FlashMessage {
 }
 
 interface Props{
-//   user: User;
-    guide: Guide;
     transactions:Transactions[];
     flash: FlashMessage;
 
 }
-
 
 // Data awal, kita ubah namanya agar jelas ini adalah data inisial
 // const initialGuideBookingsData = [
@@ -108,8 +105,6 @@ const StatusTag = ({ status }: { status: string }) => {
 const BookingCard = ({ transaction, onConfirm }: { transaction: Transactions, onConfirm: (transaction: Transactions) => void }) => {
     const cardBg = useColorModeValue('white', 'gray.800');
     const borderColor = useColorModeValue('gray.200', 'gray.700');
-
-    const tourTime = new Date(`1970-01-01T${transaction.tour.tour_start_time}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
     return (
         <Box bg={cardBg} borderRadius="lg" boxShadow="md" border="1px solid" borderColor={borderColor} p={5} transition="all 0.3s" _hover={{ boxShadow: 'lg', transform: 'translateY(-4px)' }}>
@@ -182,7 +177,7 @@ const BookingCard = ({ transaction, onConfirm }: { transaction: Transactions, on
     );
 };
 
-export default function GuideBookings( {guide, transactions, flash}: Props ){
+export default function GuideBookings( {transactions, flash}: Props ){
 
     // Get today date
     const today = new Date();
@@ -220,7 +215,7 @@ export default function GuideBookings( {guide, transactions, flash}: Props ){
             position: 'top',
         });
     }
-    }, [flash]);
+    }, [flash, toast]);
     
     const handleConfirmBooking = (transaction: Transactions) => {
         const url = route('guide.booking.status.update', { booking: transaction.booking.id });

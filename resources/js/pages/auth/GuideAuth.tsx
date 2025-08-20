@@ -4,28 +4,13 @@ import {
   Flex,
   Heading,
   Text,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
-  useColorModeValue,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
   VStack,
-  useToast,
-  Link as ChakraLink,
   Icon,
   HStack,
-  InputGroup,
-  InputRightElement,
-  IconButton
 } from '@chakra-ui/react';
 // import { useNavigate } from 'react-router-dom';
-import { Link, router, useForm } from '@inertiajs/react';
-import { FiEye, FiEyeOff, FiTrendingUp, FiCalendar, FiHeart } from 'react-icons/fi';
+import { Link, useForm } from '@inertiajs/react';
+import { FiTrendingUp, FiCalendar, FiHeart } from 'react-icons/fi';
 
 // Komponen kecil untuk menampilkan poin keuntungan
 const BenefitItem = ({ icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => (
@@ -43,9 +28,6 @@ const FOCUSED_INPUT_BORDER_COLOR = '#007bff';
 
 export default function GuideAuth(){
 
-  // const navigate = useNavigate();
-  const toast = useToast();
-  // const [activeTab, setActiveTab] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'signup' | 'reset'>('login');
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
@@ -106,29 +88,6 @@ export default function GuideAuth(){
       transform: 'translateY(-1px)',
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: 'Login Successful',
-      description: "Welcome back, Guide!",
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-    // navigate('/guide/dashboard');
-  };
-
-  const handleSignUp = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: 'Account Created',
-      description: "Your guide account has been created. Please sign in.",
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-  };
-
   // Form hook for login
   const { data: logindata, setData: setLoginData, post: postLogin, processing: loginProcessing, errors: loginErrors} = useForm({
     email: '',
@@ -155,12 +114,6 @@ export default function GuideAuth(){
   };
   
   const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 768;
-
-  const formBg = useColorModeValue('white', 'gray.700');
-  const textColor = useColorModeValue('gray.600', 'gray.400');
-  const inputBg = useColorModeValue('gray.100', 'gray.800');
-  const tabBorderColor = useColorModeValue('gray.200', 'gray.600');
-  const tabSelectedColor = useColorModeValue('blue.500', 'blue.300');
 
   return (
     <Flex minH="100vh" direction={{ base: 'column', md: 'row' }}>
@@ -545,128 +498,6 @@ export default function GuideAuth(){
 
           </div>
 
-          {/* Reset Password Form */}
-          {/* {activeTab === 'reset' && (
-            <form onSubmit={handleReset}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <p style={{ color: '#495057', lineHeight: '1.6', fontSize: '15px', textAlign: 'center' }}>
-                  Enter the email address associated with your account, and we'll send you a link to reset your password.
-                </p>
-                <div>
-                  <label style={{ fontWeight: '500', marginBottom: '8px', display: 'block', color: '#343a40' }}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                    style={inputStyle}
-                    onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.currentTarget.style.borderColor = FOCUSED_INPUT_BORDER_COLOR}
-                    onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.currentTarget.style.borderColor = BASE_INPUT_BORDER_COLOR}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  style={isHoveringSubmit ? {...primaryButtonStyle, ...primaryButtonHoverStyle} : primaryButtonStyle}
-                  onMouseEnter={() => setIsHoveringSubmit(true)}
-                  onMouseLeave={() => setIsHoveringSubmit(false)}
-                  disabled={loading}
-                >
-                  {loading ? "Sending Link..." : "Send Reset Link"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('login')}
-                  style={{
-                    backgroundColor: 'transparent',
-                    color: '#007bff',
-                    padding: '10px',
-                    border: '1px solid #007bff',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    alignSelf: 'center',
-                    width: 'auto',
-                    marginTop: '8px',
-                    transition: 'all 0.2s ease',
-                  }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
-                        e.currentTarget.style.borderColor = '#0056b3';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.borderColor = '#007bff';
-                    }}
-                >
-                  Back to Login
-                </button>
-              </div>
-            </form>
-          )}
-
-          {activeTab !== 'reset' && (
-            <>
-              <div style={{
-                position: 'relative',
-                margin: '32px 0',
-                textAlign: 'center'
-              }}>
-                <div style={{
-                  height: '1px',
-                  backgroundColor: '#dee2e6',
-                }}></div>
-                <div style={{
-                  position: 'absolute',
-                  top: '-11px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  backgroundColor: 'white',
-                  padding: '0 16px'
-                }}>
-                  <span style={{
-                    color: '#6c757d',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    textTransform: 'uppercase',
-                  }}>
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {[
-                  { provider: 'Google', color: '#DB4437', hoverColor: '#C33D2E', icon: 'G', stateSetter: setIsHoveringSocialGoogle, isHovering: isHoveringSocialGoogle },
-                  { provider: 'Facebook', color: '#4267B2', hoverColor: '#365899', icon: 'f', stateSetter: setIsHoveringSocialFacebook, isHovering: isHoveringSocialFacebook },
-                ].map(({ provider, color, hoverColor, icon, stateSetter, isHovering }) => (
-                  <button
-                    key={provider}
-                    type="button"
-                    onClick={() => handleSocialLogin(provider)}
-                    style={{
-                      ...buttonBaseStyle,
-                      backgroundColor: isHovering ? hoverColor : color,
-                      color: 'white',
-                      marginTop: '0',
-                      ...(isHovering && { boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)', transform: 'translateY(-1px)'}),
-                    }}
-                    onMouseEnter={() => stateSetter(true)}
-                    onMouseLeave={() => stateSetter(false)}
-                    disabled={loading}
-                  >
-                    <span style={{ fontSize: '18px', width: '20px', textAlign: 'center' }}>{icon}</span>
-                    Sign in with {provider}
-                  </button>
-                ))}
-                </div>
-            </>
-          )} */}
-
           <div style={{
             marginTop: '32px',
             textAlign: 'center'
@@ -689,9 +520,3 @@ export default function GuideAuth(){
   );
 
 };
-
-            {/* <Link href={route('login')}>
-              <ChakraLink color="blue.500" fontWeight="semibold">
-                Go to Traveler Sign In
-              </ChakraLink>            
-            </Link> */}

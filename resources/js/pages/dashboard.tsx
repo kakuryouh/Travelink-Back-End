@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import {
   Box, Button, Flex, Text, Heading, Image,
-  Container, Grid, Input, useColorModeValue,
+  Container, Grid, useColorModeValue,
   IconButton, Icon, Badge, VStack, HStack,
   Avatar,
 } from '@chakra-ui/react';
@@ -195,8 +195,6 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
 
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  // const [favorites, setFavorites] = useState<number[]>([2]);
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -210,6 +208,13 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
   
   const glowColorStart = useColorModeValue('rgba(49, 130, 206, 0.4)', 'rgba(99, 179, 237, 0.4)');
   const glowColorEnd = useColorModeValue('rgba(128, 90, 213, 0.6)', 'rgba(159, 122, 234, 0.6)');
+  const websiteBackgroundOpacity = useColorModeValue(0.02, 0.01);
+  const mobileDrawerBackground = useColorModeValue('gray.200', 'gray.700');
+  const closeMobileMenuBackgroundHover = useColorModeValue('red.100', 'red.800');
+  const closeMobileMenuColorHover = useColorModeValue('red.500', 'red.200');
+  const mobileDropdownMenuButtonHover = useColorModeValue('blue.100', 'rgba(49,130,206,0.15)');
+  const FeaturedTourRatingBg = useColorModeValue("whiteAlpha.900", "blackAlpha.700");
+  const TourRatingStarGrey = useColorModeValue("gray.300", "gray.600");
 
   const fadeIn = keyframes`
     from { opacity: 0; }
@@ -255,11 +260,6 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
   
   const toggleDrawer = (): void => setIsDrawerOpen(!isDrawerOpen);
 
-  // const toggleFavorite = (destinationId: number): void => {
-  //   setFavorites(prev => prev.includes(destinationId) ? prev.filter(id => id !== destinationId) : [...prev, destinationId]);
-  // };
-  // const isFavorite = (destinationId: number): boolean => favorites.includes(destinationId);
-
   const baseButtonStyle = {
     borderRadius: "lg", fontWeight: "semibold", h: "44px",
     px: 5, fontSize: "sm",
@@ -292,31 +292,13 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
     },
   };
 
-  const FavoriteButtonIcon = ({ isFav }: { isFav: boolean }) => (
-    <Icon viewBox="0 0 24 24" boxSize="20px"
-      fill={
-        isFav
-          ? "white"
-          : useColorModeValue("gray.100", "gray.700")
-      }
-      stroke={
-        isFav
-          ? "red.500"
-          : useColorModeValue("gray.500", "gray.300")
-      }
-      strokeWidth="1.5px"
-      transition="all 0.2s ease"
-    >
-      <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-    </Icon>
-  );
-
   interface SectionHeaderProps {
     title: string;
     subtitle: string;
     icon?: React.ReactNode;
     children?: React.ReactNode;
   }
+
   const SectionHeader: React.FC<SectionHeaderProps> = ({ title, subtitle, icon, children }) => (
     <Flex justify="space-between" align={{ base: 'flex-start', md: 'center' }} mb={8} direction={{ base: 'column', md: 'row' }} gap={{ base: 3, md: 2 }}>
       <Box>
@@ -344,7 +326,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
     <Box minH="100vh" bg={overallBg} position="relative" animation={`${fadeIn} 0.5s ease-out`}>
       <Box
         position="fixed" top={0} left={0} right={0} bottom={0}
-        opacity={useColorModeValue(0.02, 0.01)}
+        opacity={websiteBackgroundOpacity}
         backgroundImage={`url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`}
         zIndex={0} pointerEvents="none"
       />
@@ -377,20 +359,6 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
             {/* Page Header */}
 
             <HStack display={{ base: 'none', md: 'flex' }} spacing={3}>
-              <Box maxW="280px" mr={2} position="relative">
-                <Input
-                  placeholder="Search destinations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  pl={10} pr={4} h="42px" borderRadius="full"
-                  bg={useColorModeValue('whiteAlpha.900', 'whiteAlpha.100')}
-                  borderColor={subtleBorderColor}
-                  boxShadow="inner" fontSize="sm" variant="outline"
-                  _hover={{ borderColor: primaryColor }}
-                  _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${useColorModeValue('blue.300', 'blue.600')}`, bg: useColorModeValue('white', 'gray.750') }}
-                />
-                <Box position="absolute" left={3.5} top="50%" transform="translateY(-50%)" color={secondaryTextColor} zIndex={1} fontSize="md">🔍</Box>
-              </Box>
 
               <Link href="/ViewAllTour">
 
@@ -428,7 +396,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
             {/* Mobile Page Header Menu */}
 
             <Box display={{ base: 'block', md: 'none' }}>
-              <IconButton onClick={toggleDrawer} aria-label="Open Menu" variant="ghost" size="lg" icon={<Icon viewBox="0 0 24 24" boxSize="24px"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></Icon>} _hover={{ bg: useColorModeValue('gray.200', 'gray.700') }} />
+              <IconButton onClick={toggleDrawer} aria-label="Open Menu" variant="ghost" size="lg" icon={<Icon viewBox="0 0 24 24" boxSize="24px"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></Icon>} _hover={{ bg: mobileDrawerBackground }} />
             </Box>
           </Flex>
         </Container>
@@ -448,17 +416,16 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
           >
             <Flex justify="space-between" mb={8} align="center">
               <Heading size="lg" color={primaryTextColor} fontWeight="bold">Menu</Heading>
-              <IconButton aria-label="Close Menu" icon={<Icon viewBox="0 0 24 24" boxSize="20px"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></Icon>} size="md" variant="ghost" onClick={toggleDrawer} _hover={{ bg: useColorModeValue('red.100', 'red.800'), color: useColorModeValue('red.500', 'red.200') }} />
+              <IconButton aria-label="Close Menu" icon={<Icon viewBox="0 0 24 24" boxSize="20px"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></Icon>} size="md" variant="ghost" onClick={toggleDrawer} _hover={{ bg: closeMobileMenuBackgroundHover, color: closeMobileMenuColorHover }} />
             </Flex>
 
             {/* Dropdown Menu */}
 
             <VStack spacing={4} align="stretch">
-              <Input placeholder="Search..." bg={useColorModeValue('whiteAlpha.900', 'whiteAlpha.100')} borderColor={subtleBorderColor} borderRadius="full" h="44px" mb={2} _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }} />
               {menuItems.map((item) => (
                 <Button
                   key={item.path} w="full" variant="ghost" color={primaryTextColor}
-                  _hover={{ bg: useColorModeValue('blue.100', 'rgba(49,130,206,0.15)'), color: primaryColor, transform: 'translateX(4px)' }}
+                  _hover={{ bg: mobileDropdownMenuButtonHover, color: primaryColor, transform: 'translateX(4px)' }}
                   onClick={() => { navigateTo(item.path); toggleDrawer(); }}
                   justifyContent="flex-start"
                   leftIcon={<Text as="span" fontSize="xl" mr={3}>{item.iconString}</Text>}
@@ -609,7 +576,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                       ))}
                     </HStack>
 
-                    <Flex position="absolute" bottom={4} left={4} bg={useColorModeValue("whiteAlpha.900", "blackAlpha.700")} backdropFilter="blur(8px)" px={3} py={1.5} borderRadius="lg" alignItems="center" boxShadow="md">
+                    <Flex position="absolute" bottom={4} left={4} bg={FeaturedTourRatingBg} backdropFilter="blur(8px)" px={3} py={1.5} borderRadius="lg" alignItems="center" boxShadow="md">
                       <StarRatingDisplayIcon fill="yellow.400" color="yellow.400" boxSize={4} mr={1.5} />
                       <Text fontWeight="bold" color={primaryTextColor} fontSize="sm">{tour.tour_rating}</Text>
                       <Text fontSize="xs" color={secondaryTextColor} ml={1.5}>({tour.tour_review_count} reviews)</Text>
@@ -729,7 +696,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                         {/* <Text fontSize="xs" color={secondaryTextColor} noOfLines={1} title={guide.specialty}>{guide.specialty || guide.location}</Text> */}
                         <HStack spacing={0.5} mt={1}>
                           {[...Array(5)].map((_, i) => (
-                            <StarRatingDisplayIcon key={i} boxSize={3.5} color={i < Math.floor(guide.rating) ? "yellow.400" : useColorModeValue("gray.300", "gray.600")} />
+                            <StarRatingDisplayIcon key={i} boxSize={3.5} color={i < Math.floor(guide.rating) ? "yellow.400" : TourRatingStarGrey} />
                           ))}
                           <Text fontWeight="semibold" color={primaryTextColor} fontSize="xs" ml={1}>{guide.rating.toFixed(1)}</Text>
                           <Text fontSize="2xs" color={secondaryTextColor}>({guide.total_tours} tours)</Text>

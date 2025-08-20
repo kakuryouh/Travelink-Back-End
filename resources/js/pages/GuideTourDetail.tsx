@@ -109,6 +109,22 @@ export default function TourDetail( { tour }: Props ){
     const accentError = useColorModeValue('red.500', 'red.400');
     const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${useColorModeValue('blue.500', 'blue.400')})`;
 
+    const imageGalleryBg = useColorModeValue('gray.200', 'gray.700');
+    const formInputBg = useColorModeValue('gray.100', 'gray.700');
+    const totalPriceBg = useColorModeValue('blue.50', 'blue.900');
+    const numberOfBookerBg = useColorModeValue('teal.50', 'teal.900');
+    const numberOfBookerColor = useColorModeValue('teal.700', 'teal.200');
+    const numberOfBookerBorder = useColorModeValue('teal.400', 'teal.600');
+    const itemLabelBg = useColorModeValue('gray.100', 'gray.700');
+    const itemLabelHoverBg = useColorModeValue('gray.200', 'gray.600');
+    const tourDetailsBg = useColorModeValue('blue.50', 'gray.700');
+    const tourDescriptionBg = useColorModeValue('blue.50', 'gray.750');
+    const tourDescriptionColor = useColorModeValue('blue.700', 'blue.200');
+    const tourDescriptionBorderColor = useColorModeValue('blue.200', 'blue.800');
+    const tourItineraryBg = useColorModeValue("gray.100", "gray.750");
+    const includedItemsBg = useColorModeValue('green.50', 'green.900');
+    const excludedItemsBg = useColorModeValue('red.50', 'red.900');
+
     const baseButtonStyle = {
         borderRadius: "lg", fontWeight: "semibold", h: "44px",
         px: 5, fontSize: "sm",
@@ -189,7 +205,7 @@ export default function TourDetail( { tour }: Props ){
                         {/* --- Left Column: Image Gallery --- */}
 
                         <Box flex="1.5" animation={`${slideInUp} 0.7s ease-out 0.2s both`}>
-                            <Box position="relative" borderRadius="xl" overflow="hidden" boxShadow="xl" mb={4} h={{ base: "300px", md: "450px" }} bg={useColorModeValue('gray.200', 'gray.700')}>
+                            <Box position="relative" borderRadius="xl" overflow="hidden" boxShadow="xl" mb={4} h={{ base: "300px", md: "450px" }} bg={imageGalleryBg}>
                                 
                                 {/* Use tour.images and safely access the active image */}
                                 <Image
@@ -242,7 +258,7 @@ export default function TourDetail( { tour }: Props ){
                                         <Text fontWeight="bold" fontSize="md" color={primaryTextColor}>Number of Travelers</Text>
                                         <Badge colorScheme="blue" variant="solid" px={2} py={0.5} borderRadius="md" fontSize="xs">Max {tour.tour_max_participants}</Badge>
                                     </HStack>
-                                    <Flex align="center" justify="space-between" bg={useColorModeValue('gray.100', 'gray.700')} p={3} borderRadius="lg">
+                                    <Flex align="center" justify="space-between" bg={formInputBg} p={3} borderRadius="lg">
                                         <HStack>
                                             <Button aria-label="Decrease participants" size="sm" isDisabled= {true} borderRadius="full" w="36px" h="36px">-</Button>
                                                 <Input type="number" value={tour.tour_min_participants} isDisabled = {true} min={tour.tour_min_participants} max={tour.tour_max_participants} mx={1} textAlign="center" fontWeight="bold" w="60px" h="36px" bg={cardBg} focusBorderColor={primaryColor} />
@@ -252,7 +268,7 @@ export default function TourDetail( { tour }: Props ){
                                     </Flex>
                                 </Box>
                                 
-                                <Box bg={useColorModeValue('blue.50', 'blue.900')} p={4} borderRadius="lg" borderLeft="5px solid" borderColor={primaryColor} boxShadow="md">
+                                <Box bg={totalPriceBg} p={4} borderRadius="lg" borderLeft="5px solid" borderColor={primaryColor} boxShadow="md">
                                     <Flex justify="space-between" align="center">
                                         <Text fontWeight="bold" fontSize="lg" color={primaryTextColor}>Total Price</Text>
                                         <Text fontSize="xl" fontWeight="extrabold" color={primaryColor}>{formatPrice(totalPrice)}</Text>
@@ -262,8 +278,8 @@ export default function TourDetail( { tour }: Props ){
                                 
                                 <Button isDisabled = {true} bgGradient="linear(to-r, green.400, green.500)" _hover={{ bgGradient: "linear(to-r, green.500, green.600)" }} leftIcon={<Text fontSize="xl">🎫</Text>}>Book Now & Secure Your Spot</Button>
 
-                                <Box p={3.5} bg={useColorModeValue('teal.50', 'teal.900')} borderRadius="md" borderTop="3px solid" borderColor={useColorModeValue('teal.400', 'teal.600')} textAlign="center">
-                                    <Text fontSize="sm" fontWeight="medium" color={useColorModeValue('teal.700', 'teal.200')}>
+                                <Box p={3.5} bg={numberOfBookerBg} borderRadius="md" borderTop="3px solid" borderColor={numberOfBookerBorder} textAlign="center">
+                                    <Text fontSize="sm" fontWeight="medium" color={numberOfBookerColor}>
                                         <Text as="span" fontWeight="bold">📈 {tour.transactions_count} people</Text> booked this tour in the last month!
                                     </Text>
                                 </Box>
@@ -293,7 +309,7 @@ export default function TourDetail( { tour }: Props ){
                                     { label: 'Group Size', value: `Max ${tour.tour_max_participants} people`, icon: FiUsers },
                                     { label: 'Languages', value: 'English, Indonesian', icon: FiMessageCircle },
                                 ].map(item => (
-                                    <Flex key={item.label} align="center" bg={useColorModeValue('gray.100', 'gray.700')} p={4} borderRadius="lg" transition="all 0.2s ease" _hover={{ bg: useColorModeValue('gray.200', 'gray.600'), transform: "translateY(-2px)", boxShadow: "md" }}>
+                                    <Flex key={item.label} align="center" bg={itemLabelBg} p={4} borderRadius="lg" transition="all 0.2s ease" _hover={{ bg: itemLabelHoverBg, transform: "translateY(-2px)", boxShadow: "md" }}>
                                         <Icon as={item.icon} boxSize={6} color={primaryColor} mr={4}/>
                                         <Box>
                                             <Text fontSize="sm" color={secondaryTextColor} fontWeight="medium">{item.label}</Text>
@@ -331,7 +347,7 @@ export default function TourDetail( { tour }: Props ){
                 <Box bg={cardBg} borderRadius="xl" boxShadow="xl" overflow="hidden" border="1px solid" borderColor={subtleBorderColor} animation={`${slideInUp} 0.7s ease-out 0.5s both`}>
                     <Flex borderBottom="1px solid" borderColor={subtleBorderColor}>
                         {['Description', 'Itinerary', 'Inclusions'].map((tabName, index) => (
-                            <Box key={tabName} py={4} px={{ base: 4, md: 8 }} fontWeight="bold" fontSize={{ base: "sm", md: "md" }} borderBottom={activeTab === index ? "3px solid" : "3px solid transparent"} borderColor={activeTab === index ? primaryColor : "transparent"} color={activeTab === index ? primaryColor : secondaryTextColor} cursor="pointer" onClick={() => setActiveTab(index)} transition="all 0.3s ease" bg={activeTab === index ? useColorModeValue('blue.50', 'gray.700') : "transparent"} _hover={{ color: primaryColor, bg: useColorModeValue('blue.50', 'gray.700') }} flex={1} textAlign="center">
+                            <Box key={tabName} py={4} px={{ base: 4, md: 8 }} fontWeight="bold" fontSize={{ base: "sm", md: "md" }} borderBottom={activeTab === index ? "3px solid" : "3px solid transparent"} borderColor={activeTab === index ? primaryColor : "transparent"} color={activeTab === index ? primaryColor : secondaryTextColor} cursor="pointer" onClick={() => setActiveTab(index)} transition="all 0.3s ease" bg={activeTab === index ? tourDetailsBg : "transparent"} _hover={{ color: primaryColor, bg: tourDetailsBg }} flex={1} textAlign="center">
                                 {tabName}
                             </Box>
                         ))}
@@ -341,8 +357,8 @@ export default function TourDetail( { tour }: Props ){
                         {activeTab === 0 && (
                             <VStack spacing={6} align="stretch" animation={`${fadeIn} 0.5s ease`}>
                                 <Text fontSize="md" lineHeight="1.8" color={secondaryTextColor}>{tour.tour_description}</Text>
-                                <Box mt={4} p={5} bg={useColorModeValue('blue.50', 'gray.750')} borderRadius="lg" border="1px solid" borderColor={useColorModeValue('blue.200', 'blue.800')}>
-                                    <Heading size="md" mb={4} color={useColorModeValue('blue.700', 'blue.200')}>🏝️ Key Highlights</Heading>
+                                <Box mt={4} p={5} bg={tourDescriptionBg} borderRadius="lg" border="1px solid" borderColor={tourDescriptionBorderColor}>
+                                    <Heading size="md" mb={4} color={tourDescriptionColor}>🏝️ Key Highlights</Heading>
                                     <Flex wrap="wrap" gap={3}>
                                         {tour.tags.map(tag => (
                                             <Badge key={tag.id} variant="solid" colorScheme="green" px={3} py={1.5} borderRadius="md" fontSize="xs" fontWeight="bold">
@@ -357,7 +373,7 @@ export default function TourDetail( { tour }: Props ){
                         {activeTab === 1 && (
                             <VStack spacing={5} align="stretch" animation={`${fadeIn} 0.5s ease`}>
                                 {tour.itineraries?.map((item, index) => (
-                                    <Flex key={index} gap={5} p={5} borderRadius="lg" bg={index % 2 === 0 ? "transparent" : useColorModeValue("gray.100", "gray.750")} border="1px solid" borderColor={subtleBorderColor} transition="all 0.25s ease" _hover={{ borderColor: primaryColor, boxShadow: "lg", transform: "translateY(-3px)" }}>
+                                    <Flex key={index} gap={5} p={5} borderRadius="lg" bg={index % 2 === 0 ? "transparent" : tourItineraryBg} border="1px solid" borderColor={subtleBorderColor} transition="all 0.25s ease" _hover={{ borderColor: primaryColor, boxShadow: "lg", transform: "translateY(-3px)" }}>
                                         <Box minW="40px" h="40px" borderRadius="full" bgGradient={accentGradient} color="white" display="flex" justifyContent="center" alignItems="center" fontWeight="bold" fontSize="lg" boxShadow="md" flexShrink={0}>{index + 1}</Box>
                                         <Box flex="1">
                                             <Flex justify="space-between" align="flex-start" mb={1.5} flexWrap="wrap" gap={2}>
@@ -382,7 +398,7 @@ export default function TourDetail( { tour }: Props ){
                                     
                                     <VStack spacing={4} align="stretch">
                                         {excludedItems?.map((item) => (
-                                            <Flex key={item.id} align="center" bg={useColorModeValue('green.50', 'green.900')} p={3.5} borderRadius="md" borderLeft="4px solid" borderColor={accentSuccess} boxShadow="sm">
+                                            <Flex key={item.id} align="center" bg={includedItemsBg} p={3.5} borderRadius="md" borderLeft="4px solid" borderColor={accentSuccess} boxShadow="sm">
                                                 <Text color={accentSuccess} fontWeight="bold" mr={3} fontSize="lg">✓</Text>
                                                 <Text fontWeight="medium" fontSize="sm" color={primaryTextColor}>{item.name}</Text>
                                             </Flex>
@@ -400,7 +416,7 @@ export default function TourDetail( { tour }: Props ){
 
                                     <VStack spacing={4} align="stretch">
                                         {includedItems?.map((item) => (
-                                            <Flex key={item.id} align="center" bg={useColorModeValue('red.50', 'red.900')} p={3.5} borderRadius="md" borderLeft="4px solid" borderColor={accentError} boxShadow="sm">
+                                            <Flex key={item.id} align="center" bg={excludedItemsBg} p={3.5} borderRadius="md" borderLeft="4px solid" borderColor={accentError} boxShadow="sm">
                                                 <Text color={accentError} fontWeight="bold" mr={3} fontSize="lg">✕</Text>
                                                 <Text fontWeight="medium" fontSize="sm" color={primaryTextColor}>{item.name}</Text>
                                             </Flex>

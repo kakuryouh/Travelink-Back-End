@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
-  Flex,
   Heading,
   Text,
   useColorModeValue,
@@ -9,7 +8,6 @@ import {
   Button,
   Textarea,
   useToast,
-  Spinner,
   FormControl,
   FormLabel,
   Divider,
@@ -18,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 // import { useNavigate, useParams } from 'react-router-dom';
-import { Link, router, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import GuideLayout from '../layouts/GuideLayout';
 
 // --- DATA & FUNGSI SIMULASI ---
@@ -76,7 +74,7 @@ interface Props{
 export default function CancelBooking( {guide, transaction}:Props ){
   const toast = useToast();
 
-  const { data, setData: setCancelationData, post, processing, errors, reset } = useForm({
+  const { data, setData: setCancelationData, post, processing} = useForm({
     transactionID: transaction.id,
     bookingID: transaction.booking.id,
     Booking_status: transaction.booking.booking_status,
@@ -103,6 +101,8 @@ export default function CancelBooking( {guide, transaction}:Props ){
   };
 
   const cardBg = useColorModeValue('white', 'gray.800');
+  const cancelMessageColor = useColorModeValue('gray.600', 'gray.400');
+  const bookingInfoColor = useColorModeValue('gray.500', 'gray.400');
 
   if (!transaction) {
     return (
@@ -127,7 +127,7 @@ export default function CancelBooking( {guide, transaction}:Props ){
         <Heading as="h1" size="xl" mb={4}>
           Cancel Booking
         </Heading>
-        <Text color={useColorModeValue('gray.600', 'gray.400')} mb={8}>
+        <Text color={cancelMessageColor} mb={8}>
           You are about to cancel the booking for {transaction.user.name}. Please provide a reason for the cancellation.
         </Text>
 
@@ -143,7 +143,7 @@ export default function CancelBooking( {guide, transaction}:Props ){
 
             <Box>
               <Heading size="md" mb={4}>{transaction.tour.name}</Heading>
-              <HStack spacing={6} color={useColorModeValue('gray.500', 'gray.400')}>
+              <HStack spacing={6} color={bookingInfoColor}>
                 <HStack><Icon as={FiUser} /><Text>{transaction.user.name}</Text></HStack>
                 <HStack><Icon as={FiCalendar} /><Text>{transaction.tour_date}</Text></HStack>
               </HStack>

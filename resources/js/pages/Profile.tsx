@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Box, Button, Flex, Text, Heading, Container, Grid, Input,
-  useColorModeValue, Icon, Badge, VStack, HStack, Tabs,
-  TabList, TabPanels, Tab, TabPanel, Avatar, Divider, Switch, useToast,
-  Tooltip, Select
+  useColorModeValue, Icon, VStack, HStack, Tabs,
+  TabList, TabPanels, Tab, TabPanel, Avatar, Divider, Switch, useToast, Select
 } from '@chakra-ui/react';
 import {
   ChevronRightIcon, EditIcon, CheckIcon, CloseIcon, SettingsIcon, CalendarIcon,
@@ -12,7 +11,6 @@ import {
 import { useForm, Link } from '@inertiajs/react';
 import { format } from 'date-fns'
 import { keyframes } from '@emotion/react';
-import { TextIcon } from 'lucide-react';
 
 // --- Keyframes ---
 const slideInUp = keyframes`
@@ -39,32 +37,6 @@ interface InfoCardProps {
   value: string | number;
   iconAs?: React.ElementType; 
 }
-
-// Define a type that represents the keys of your form data
-type FormFieldKey = 'name' | 'email' | 'phone_number' | 'language_id';
-
-// Define a base type with common properties
-interface BaseField {
-    label: string;
-    name: FormFieldKey;
-    iconAs: React.ElementType;
-}
-
-// Define the type for a standard text input
-interface InputField extends BaseField {
-    component: 'input';
-    type: string;
-}
-
-// Define the type for a select dropdown
-interface SelectField extends BaseField {
-    component: 'select';
-    options: { value: number | string; label: string }[];
-}
-
-// Your main type is now a union of the two specific types
-type FormField = InputField | SelectField;
-
 
 interface Language {
   id: number;
@@ -93,7 +65,8 @@ export default function Profile({ user, languages }: Props) {
   const toast = useToast();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const { data, setData: setProfileData, patch, processing, errors, reset } = useForm({
+
+  const { data, setData: setProfileData, patch, errors, reset } = useForm({
       name: user.name,
       email: user.email,
       password: user.password,
@@ -102,7 +75,7 @@ export default function Profile({ user, languages }: Props) {
   });
 
   const photoInput = useRef<HTMLInputElement>(null);
-  const { data: photoData, setData: setPhotoData, post, processing: photoProcessing, errors: photoErrors } = useForm({
+  const { data: photoData, setData: setPhotoData, post, errors: photoErrors } = useForm({
       photo: null as File | null,
   });
 
@@ -124,7 +97,7 @@ export default function Profile({ user, languages }: Props) {
         }
       });
     }
-  }, [photoData.photo]);
+  }, [photoData.photo, post, toast]);
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -145,6 +118,8 @@ export default function Profile({ user, languages }: Props) {
   const secondaryTextColor = useColorModeValue('gray.500', 'gray.400');
   const subtleBorderColor = useColorModeValue('gray.200', 'gray.700');
   const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${useColorModeValue('blue.500', 'blue.400')})`;
+  const activeTabHoverBg = useColorModeValue('blue.100', 'gray.700');
+  const accountSignOutText = useColorModeValue('red.700', 'red.200');
 
   const baseButtonStyle = {
     borderRadius: "lg", fontWeight: "semibold", h: "44px",
@@ -185,10 +160,8 @@ export default function Profile({ user, languages }: Props) {
     e.preventDefault();
     patch(route('Profile.update'), {
         onSuccess: () => {
-          // This code only runs after a successful update.
-          setIsEditing(false); // <-- This is the key fix!
+          setIsEditing(false);
 
-          // You can also show a success notification here.
           toast({
             title: "Profile Updated",
             description: "Your information has been successfully saved.",
@@ -228,35 +201,10 @@ export default function Profile({ user, languages }: Props) {
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
-      setPhotoData('photo', e.target.files[0]), {
-        onSuccess: () => {
-          setIsEditing(false);
-          
-          toast({
-            title: "Profile picture Updated",
-            description: "Profile Picture Updated.",
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-      }
+      const photo = e.target.files[0];
+      setPhotoData('photo', photo);
     }
   }
-
-  // This array now just defines the structure of your form
-  const fieldsToRender: FormField[] = [
-      { component: 'input', label: "Full Name", name: "name", type: "text", iconAs: InfoOutlineIcon },
-      { component: 'input', label: "Email Address", name: "email", type: "email", iconAs: EmailIcon },
-      { component: 'input', label: "Phone Number", name: "phone_number", type: "tel", iconAs: ChatIcon },
-      { 
-          component: 'select', 
-          label: "Language", 
-          name: "language_id", 
-          iconAs: ChatIcon, // Replace with a Language icon if you have one
-          options: languages.map(lang => ({ value: lang.id, label: lang.name }))
-      },
-  ];
 
   return (
     <Box minH="100vh" bg={overallBg} animation={`${fadeIn} 0.5s ease-out`}>
@@ -301,21 +249,14 @@ export default function Profile({ user, languages }: Props) {
 
               {/* Avatar */}
 
-              {/* <Avatar size="xl" name={user.name} src={userData.profilePicture} border="4px solid" borderColor={useColorModeValue('white', 'gray.700')} boxShadow={`0 0 12px ${useColorModeValue(primaryColor, 'blue.300')}`} />
-              {isEditing && <Button size="xs" variant="outline" colorScheme="blue" onClick={()=>alert("Implement photo upload functionality.")}>Change Photo</Button>}*/}
-
-              {/* 5. Add an onClick to the Avatar (or a button) */}
               <Avatar
                   size="xl"
                   name={user.name}
-                  // 7. Display the new photo from the storage path
                   src={user.profile_photo_path ? `/storage/${user.profile_photo_path}` : `https://ui-avatars.com/api/?name=${user.name}`}
                   cursor={isEditing ? 'pointer' : 'default'}
-                  // Only attach the click handler if in editing mode
                   onClick={isEditing ? () => photoInput.current?.click() : undefined}
               />
 
-              {/* 6. Create the hidden file input */}
               <input
                   type="file"
                   style={{ display: "none"}}
@@ -332,11 +273,6 @@ export default function Profile({ user, languages }: Props) {
               <Heading size="xl" color={primaryTextColor} fontWeight="bold" mb={1.5} animation={`${slideInUp} 0.7s ease-out 0.1s both`}>
                 {isEditing ? `Editing Profile: ${user.name}` : `Welcome, ${user.name}`}
               </Heading>
-
-              {/* <Badge px={3} py={1} borderRadius="full" bgGradient={accentGradient} color="white" fontSize="sm" fontWeight="bold" mb={3} display="inline-flex" alignItems="center" animation={`${slideInUp} 0.7s ease-out 0.2s both`} boxShadow="md">
-                <Icon viewBox="0 0 24 24" boxSize={3.5} mr={1.5} fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"></path></Icon>
-                {isEditing ? `Updating from ${formData.location}` : `${userData.location}`}
-              </Badge> */}
               
               <Text color={secondaryTextColor} fontSize="md" mb={4} animation={`${slideInUp} 0.7s ease-out 0.3s both`}>
                 Member since {format(new Date(user.created_at), 'MMMM dd, yyyy')}.
@@ -378,7 +314,7 @@ export default function Profile({ user, languages }: Props) {
                 bg={activeTabIndex === index ? primaryColor : 'transparent'}
                 boxShadow={activeTabIndex === index ? 'md' : 'none'}
                 transition="all 0.3s ease"
-                _hover={{ bg: activeTabIndex !== index ? useColorModeValue('blue.100', 'gray.700') : primaryHoverColor, color: activeTabIndex !== index ? primaryColor : 'white' }}
+                _hover={{ bg: activeTabIndex !== index ? activeTabHoverBg : primaryHoverColor, color: activeTabIndex !== index ? primaryColor : 'white' }}
                 _selected={{ color: 'white', bg: primaryColor, boxShadow: 'lg' }}
               >
                 <Icon as={tab.icon} mr={2} boxSize={4} /> {tab.label}
@@ -394,53 +330,75 @@ export default function Profile({ user, languages }: Props) {
                   <VStack spacing={5} align="stretch">
                     <Heading size="lg" color={primaryTextColor} mb={2} textAlign="center">Update Your Information</Heading>
 
-                      {fieldsToRender.map(field => (
-                          <Box key={field.name}>
-                              <HStack as="label" htmlFor={field.name} /* ...label styles... */>
-                                  {field.iconAs && <Icon as={field.iconAs} color={primaryColor} boxSize={4}/>}
-                                  <Text ml={field.iconAs != null ? 1 : 0}>{field.label}</Text>
+                          <Box>
+                              <HStack as="label" fontSize="md" fontWeight="medium" color={primaryTextColor} mb={1.5} display="flex" align="center" marginTop={5}>
+                                <Icon as={InfoOutlineIcon} color={primaryColor} boxSize={4}/>
+                                <Text ml={InfoOutlineIcon != null ? 1 : 0}>Full Name</Text>
                               </HStack>
                               
-                              {/* ---- Conditional Rendering Starts Here ---- */}
+                              <Input
+                                  id={data.name}
+                                  name={data.name}
+                                  value={data.name ?? ''}
+                                  onChange={(e) => setProfileData('name', e.target.value)}
+                                  bg={inputBg} h="46px" borderRadius="lg" fontSize="sm"
+                                  _hover={{ bg: inputHover }}
+                                  _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
+                              />
+                              {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
 
-                              {field.component === 'input' && (
-                                  <Input
-                                      id={field.name}
-                                      name={field.name}
-                                      type={field.type}
-                                      value={data[field.name] ?? ''}
-                                      onChange={(e) => setProfileData(field.name as any, e.target.value)}
-                                      bg={inputBg} h="46px" borderRadius="md" fontSize="sm"
-                                     _hover={{ bg: inputHover }}
-                                     _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
-                                  />
-                              )}
+                              <HStack as="label" fontSize="md" fontWeight="medium" color={primaryTextColor} mb={1.5} display="flex" align="center" marginTop={5}>
+                                <Icon as={EmailIcon} color={primaryColor} boxSize={4}/>
+                                <Text ml={EmailIcon != null ? 1 : 0}>Email Address</Text>
+                              </HStack>
 
-                              {field.component === 'select' && (
-                                  <Select
-                                      id={field.name}
-                                      name={field.name}
-                                      value={data[field.name] ?? ''}
-                                      onChange={(e) => setProfileData(field.name as any, e.target.value)}
-                                      variant="filled"
-                                      bg={inputBg} h="46px" borderRadius="md" fontSize="sm"
-                                     _hover={{ bg: inputHover }}
-                                     _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
-                                  >
-                                      <option value="">-- Select a Language --</option>
-                                      {field.options.map(option => (
-                                          <option key={option.value} value={option.value}>
-                                              {option.label}
-                                          </option>
-                                      ))}
-                                  </Select>
-                              )}
+                              <Input
+                                  id={data.email}
+                                  name={data.email}
+                                  value={data.email ?? ''}
+                                  onChange={(e) => setProfileData('email', e.target.value)}
+                                  bg={inputBg} h="46px" borderRadius="lg" fontSize="sm"
+                                  _hover={{ bg: inputHover }}
+                                  _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
+                              />
+                              {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
 
-                              {/* This error display works for both inputs and selects */}
-                              {errors[field.name] && <p style={{ color: 'red', marginTop: '5px' }}>{errors[field.name]}</p>}
+                              <HStack as="label" fontSize="md" fontWeight="medium" color={primaryTextColor} mb={1.5} display="flex" align="center" marginTop={5}>
+                                <Icon as={ChatIcon} color={primaryColor} boxSize={4}/>
+                                <Text ml={ChatIcon != null ? 1 : 0}>Phone Number</Text>
+                              </HStack>
 
+                              <Input
+                                  value={data.phone_number ?? ''}
+                                  onChange={(e) => setProfileData('phone_number', e.target.value)}
+                                  bg={inputBg} h="46px" borderRadius="lg" fontSize="sm"
+                                  _hover={{ bg: inputHover }}
+                                  _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
+                              />
+                              {errors.phone_number && <p style={{ color: 'red' }}>{errors.phone_number}</p>}
+
+                              <HStack as="label" fontSize="md" fontWeight="medium" color={primaryTextColor} mb={1.5} display="flex" align="center" marginTop={5}>
+                                <Icon as={ChatIcon} color={primaryColor} boxSize={4}/>
+                                <Text ml={ChatIcon != null ? 1 : 0}>Language</Text>
+                              </HStack>
+
+                              <Select
+                                value={data.language_id ?? ''}
+                                onChange={(e) => setProfileData('language_id', e.target.value)}
+                                variant="filled"
+                                bg={inputBg} h="46px" borderRadius="lg" fontSize="sm"
+                                _hover={{ bg: inputHover }}
+                                _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 2px ${inputFocus}`, bg: InputFocusBg }}
+                            >
+                                <option value="">-- Select a Language --</option>
+                                {languages.map((lang) => (
+                                    <option key={lang.id} value={lang.id}>
+                                        {lang.name}
+                                    </option>
+                                ))}
+                              </Select>
+                              {errors.language_id && <p style={{ color: 'red' }}>{errors.language_id}</p>}
                           </Box>
-                      ))}
                       
                     <HStack justifyContent="flex-end" spacing={3} pt={4} mt={2} borderTop="1px dashed" borderColor={subtleBorderColor}>
                       <Button {...secondaryButtonStyle} onClick={handleCancelEdit} leftIcon={<CloseIcon boxSize={3}/>}>Cancel</Button>
@@ -490,17 +448,6 @@ export default function Profile({ user, languages }: Props) {
                         <HStack><Icon as={ChatIcon} color={primaryColor} boxSize={5}/><Text fontWeight="medium" color={primaryTextColor} fontSize="md">SMS Notifications for Updates</Text></HStack>
                       <Switch colorScheme="blue" size="md" />
                     </Flex>
-                    <Tooltip label="This feature is currently under development." placement="top" hasArrow bg="gray.600" color="white">
-                      
-                      <Link href='#'>
-                        
-                        <Button {...secondaryButtonStyle} leftIcon={<LockIcon boxSize={4}/>} justifyContent="flex-start" size="md" w="full">
-                          Change Password
-                        </Button>
-                      
-                      </Link>
-
-                    </Tooltip>
                   </VStack>
                 </Box>
 
@@ -513,26 +460,22 @@ export default function Profile({ user, languages }: Props) {
                 <Box p={5} bgGradient={`linear(to-br, ${AccountDeletionBgGradient_1}, ${AccountDeletionBgGradient_2})`} borderRadius="lg" border="1px solid" borderColor={AccountDeletionBorderColor} boxShadow="md">
                   <HStack mb={3} spacing={2.5}>
                     <Icon as={WarningTwoIcon} color={WarningTwoIconColor} boxSize={6} animation={`${iconWiggle} 4s ease-in-out infinite alternate`} />
-                    <Heading size="md" color={useColorModeValue('red.700', 'red.200')}>Account Deletion</Heading>
+                    <Heading size="md" color={accountSignOutText}>Account Sign Out</Heading>
                   </HStack>
-                  <Text color={useColorModeValue('red.700', 'red.300')} mb={5} fontSize="sm">
-                    Warning: Deleting your account is a permanent action. All your profile information, booking history, and reviews will be irretrievably lost. Please be certain before proceeding.
-                  </Text>
 
-                  {/* <Button {...dangerButtonStyle} size="md" leftIcon={<DeleteIcon boxSize={4}/>} onClick={() => toast({ title: "Account Deletion (Simulated)", description: "This is a demonstration only. Your account has not been deleted.", status: "warning", duration: 5000, position: "top", icon: <Icon as={WarningTwoIcon} w={4} h={4} color="orange.500"/>})}>
-                    Confirm Account Deletion
-                  </Button> */}
-
-                  <Link href={route('logout')} method="post">
-                    <Button {...dangerButtonStyle} size="md" leftIcon={<DeleteIcon boxSize={4}/>}>
-                      Log out
-                    </Button>
-                  </Link>
+                  <Button 
+                    as={Link}
+                    href={route('logout')}
+                    method="post"
+                    {...dangerButtonStyle}
+                    size="md" 
+                    leftIcon={<DeleteIcon boxSize={4}/>}
+                    >
+                    Log out
+                  </Button>
                   
                 
                 </Box>
-                
-                {/* End Of Account Deletion Section */}
 
               </VStack>
             </Box></TabPanel>

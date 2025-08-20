@@ -1,17 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box, Flex, Text, Heading, 
   useColorModeValue, VStack, HStack,
-  Button, IconButton, Tag, AlertDialog,
-  AlertDialogBody, AlertDialogFooter, AlertDialogHeader,
-  AlertDialogContent, AlertDialogOverlay, useToast
+  Button, IconButton, Tag, useToast
 } from '@chakra-ui/react';
 import {
     FiPlus, FiEdit, FiEye, FiPower
 } from 'react-icons/fi';
 import GuideLayout from '../layouts/GuideLayout'; 
 import { Link } from '@inertiajs/react';
-import { link } from 'fs';
 
 // const initialGuideTours = [
 //     {
@@ -40,11 +37,6 @@ import { link } from 'fs';
 //     }
 // ];
 
-interface Guide{
-  id: number;
-  name: string;
-}
-
 interface FlashMessage {
   success?: string;
   error?: string;
@@ -67,24 +59,13 @@ interface Props{
 
 export default function GuideTours( {tours, flash}:Props ){
     
-    // const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    // const [tourToDelete, setTourToDelete] = useState<number | null>(null);
     const toast = useToast();
-    
-    // PERBAIKAN FINAL DI SINI
-    const cancelRef = useRef<HTMLButtonElement>(null);
 
     const cardBg = useColorModeValue('white', 'gray.800');
     const secondaryTextColor = useColorModeValue('gray.500', 'gray.400');
     const borderColor = useColorModeValue('gray.200', 'gray.700');
 
-    // const openDeleteDialog = (tourId: number) => {
-    //     setTourToDelete(tourId);
-    //     setIsDeleteDialogOpen(true);
-    // };
-
     useEffect(() => {
-    // If a success message exists in the props, show the toast
     if (flash.success) {
         toast({
             title: 'Success!',
@@ -107,7 +88,7 @@ export default function GuideTours( {tours, flash}:Props ){
             position: 'top',
         });
     }
-    }, [flash]);
+    }, [flash, toast]);
     
     return (
         <GuideLayout>

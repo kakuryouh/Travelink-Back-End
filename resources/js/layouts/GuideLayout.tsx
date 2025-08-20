@@ -24,7 +24,6 @@ import {
     FiCalendar,
     FiUser,
     FiSettings,
-    FiLogOut,
     FiMenu,
     FiBell,
 } from 'react-icons/fi';
@@ -45,12 +44,6 @@ interface GuideLayoutProps {
     children: ReactNode;
 }
 
-// --- MOCK DATA & CONFIG ---
-const guideData = {
-    name: "Budi Hartono",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-};
-
 // --- PERUBAHAN 1: "Settings" DIHAPUS DARI SINI ---
 const LinkItems = [
     { name: 'Dashboard', icon: FiHome, path: route('guide.dashboard') },
@@ -62,6 +55,7 @@ const LinkItems = [
 // --- CHILD COMPONENTS ---
 const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
     const isActive = location.pathname === path;
+    const NavItemColor = useColorModeValue('gray.600', 'gray.200');
 
     if(path === route('guide.logout')){
         return (
@@ -74,7 +68,7 @@ const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
                     role="group"
                     cursor="pointer"
                     bg={isActive ? 'blue.400' : 'transparent'}
-                    color={isActive ? 'white' : useColorModeValue('gray.600', 'gray.200')}
+                    color={isActive ? 'white' : NavItemColor}
                     _hover={{
                         bg: 'blue.400',
                         color: 'white',
@@ -99,7 +93,7 @@ const NavItem = ({ icon, children, path, ...rest }: NavItemProps) => {
                     role="group"
                     cursor="pointer"
                     bg={isActive ? 'blue.400' : 'transparent'}
-                    color={isActive ? 'white' : useColorModeValue('gray.600', 'gray.200')}
+                    color={isActive ? 'white' : NavItemColor}
                     _hover={{
                         bg: 'blue.400',
                         color: 'white',

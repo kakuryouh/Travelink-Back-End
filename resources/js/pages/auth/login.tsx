@@ -1,15 +1,6 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 // import { useNavigate } from 'react-router-dom';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { Link, useForm } from '@inertiajs/react';
 
 interface Destination {
   name: string;
@@ -65,8 +56,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
-  const [isHoveringSocialGoogle, setIsHoveringSocialGoogle] = useState(false);
-  const [isHoveringSocialFacebook, setIsHoveringSocialFacebook] = useState(false);
   const [isHoveringGuideLogin, setIsHoveringGuideLogin] = useState(false);
 
 

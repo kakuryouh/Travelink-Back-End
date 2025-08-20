@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Text, Heading, useColorModeValue, Icon, VStack, HStack, Button,
   IconButton, FormControl, FormLabel, Input, Textarea, Select, NumberInput,
-  NumberInputField, SimpleGrid, useToast, Spinner, InputGroup, NumberDecrementStepper,
+  NumberInputField, SimpleGrid, useToast, InputGroup, NumberDecrementStepper,
   NumberIncrementStepper, NumberInputStepper, Tag, TagLabel, TagCloseButton, Image
 } from '@chakra-ui/react';
 import { FiPlus, FiTrash2, FiUploadCloud, FiArrowDown, FiArrowUp, FiX } from 'react-icons/fi';
-import { Link, router, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import GuideLayout from '../layouts/GuideLayout'; 
 
 // --- MOCK DATABASE & API CALL SIMULATION ---
@@ -22,12 +22,6 @@ interface TourImage{
   image_path: string;
   image_order: number;
   image_caption: string;
-}
-
-interface TourImagePreview {
-  file: File;
-  previewUrl: string;
-  caption: string;
 }
 
 interface Tag{
@@ -172,7 +166,7 @@ export default function EditTour( { tour, categories, dayphases, meetingpoints, 
     ];
 
     // 2. Initialize useForm with mapped values
-    const { data, setData: setEditTourData, post, processing, errors, reset } = useForm<TourFormData>({
+    const { data, setData: setEditTourData, post} = useForm<TourFormData>({
         id: tour.id,
         name: tour.name,
         tour_location_id: tour.location?.id ?? null,
@@ -214,10 +208,9 @@ export default function EditTour( { tour, categories, dayphases, meetingpoints, 
     ); 
 
     useEffect(() => {
-    const payload = itinerary.map(({ uid, ...rest }) => rest);
-    setEditTourData('tour_itineraries', payload as any);
-    }, [itinerary]);
-
+    setEditTourData("tour_itineraries", itinerary);
+    }, [itinerary, setEditTourData]);
+    
     const handleAddItineraryStep = () => {
     setItinerary(prev => {
         const nextStepNumber = prev.length > 0 ? Math.max(...prev.map(s => s.step_number)) + 1 : 1;

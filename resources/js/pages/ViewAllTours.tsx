@@ -167,11 +167,11 @@ export default function ViewAllTours({ user, tours }: Props){
             setFilteredTours(results);
             setLoading(false);
         }, 500);
-    }, [searchQuery, selectedCategory, sortOrder]);
+    }, [searchQuery, selectedCategory, sortOrder, tours]);
 
     useEffect(() => {
         filterTours();
-    }, [filterTours]);
+    }, [filterTours, tours]);
 
 
     const totalPages = Math.ceil(filteredTours.length / toursPerPage);

@@ -200,10 +200,6 @@ interface Props{
 
 export default function Bookings( { user, transactions, flash} : Props ){
 
-  // Don't Enable unless you are trying to debug data passing!
-  // console.log("PROPS RECEIVED FROM LARAVEL:", transactions);
-
-  // Get today date
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -215,10 +211,10 @@ export default function Bookings( { user, transactions, flash} : Props ){
   const toast = useToast();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
-  const [bookingToCancel, setbookingToCancel] = useState<any>(null);
-  const [currentRating, setCurrentRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
+  const [selectedBooking, setSelectedBooking] = useState<Transactions | null>(null);
+  const [bookingToCancel, setbookingToCancel] = useState<Transactions | null>(null);
+  // const [currentRating, setCurrentRating] = useState(0);
+  // const [hoverRating, setHoverRating] = useState(0);
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -302,19 +298,18 @@ export default function Bookings( { user, transactions, flash} : Props ){
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
   
-  const handleOpenReviewModal = (booking: any) => {
+  const handleOpenReviewModal = (booking: Transactions) => {
     setSelectedBooking(booking);
     setbookingToCancel(null);
     setReviewData({
-      transaction_id: booking.id,
+      transactionID: booking.id,
       rating: 0,
       review: '',
     });
-    setHoverRating(0);
     onOpen();
   };
 
-  const handleOpenCancelBooking = (booking: any) => {
+  const handleOpenCancelBooking = (booking: Transactions) => {
     setbookingToCancel(booking);
     setSelectedBooking(null);
     setCancelationData({
@@ -350,15 +345,24 @@ export default function Bookings( { user, transactions, flash} : Props ){
             position: 'top',
         });
     }
-  }, [flash]);
+  }, [flash, toast]);
 
-  const {data: reviewData, setData: setReviewData, post: postReview, processing: ProcessingReview, errors: ReviewErrors} = useForm({
-    transaction_id: null,
+  const {data: reviewData, setData: setReviewData, post: postReview, processing: ProcessingReview} = useForm<{
+    transactionID: number | null;
+    rating: number;
+    review: string;
+  }>({
+    transactionID: null,
     rating: 0,
     review: '',
   });
 
-  const {data: cancelationData, setData: setCancelationData, post: cancelationPost, processing: CancelationProcessing, errors: cancelationErrors, reset: cancelationReset } = useForm({
+  const {data: cancelationData, setData: setCancelationData, post: cancelationPost, processing: CancelationProcessing} = useForm<{
+    transactionID: number | null,
+    bookingID: number | null,
+    Booking_status: string,
+    cancelation_reason: string,
+  }>({
     transactionID: null,
     bookingID: null,
     Booking_status: '',
@@ -425,7 +429,15 @@ export default function Bookings( { user, transactions, flash} : Props ){
     </Box>
   );
 
-  const renderBookingCard = (booking: any, isUpcoming: boolean, canceled: boolean) => {
+  const bookingInfoBorder = useColorModeValue('gray.200', 'gray.600');
+  const reviewNoticeBg = useColorModeValue("green.50", "green.800");
+  const reviewNoticeBorder = useColorModeValue("green.500", "green.300");
+  const reviewNoticeIconColor = useColorModeValue("green.500", "green.300");
+  const reviewNoticeTextColor = useColorModeValue("green.700", "green.200");
+  const greyStarColor = useColorModeValue("gray.300", "gray.600");
+  const TabHoverBg = useColorModeValue('blue.100', 'gray.700')
+
+  const renderBookingCard = (booking: Transactions, isUpcoming: boolean, canceled: boolean) => {
     const daysDiff = isUpcoming ? calculateDaysDifference(booking.tour_date) : Math.floor((new Date().getTime() - new Date(booking.tour_date).getTime()) / (1000 * 60 * 60 * 24));
     let countdownText = "";
     const TransactionTourReview = booking.tour.reviews.filter((r:TourReview) => (r.transaction_id) === booking.id)
@@ -510,7 +522,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
             <Grid
               templateColumns={{ base: "repeat(2, 1fr)", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)"}}
               gap={{ base: 3, md: 4 }} mb={5} p={4} bg={infoBoxBg} borderRadius="lg"
-              border="1px solid" borderColor={useColorModeValue('gray.200', 'gray.600')}
+              border="1px solid" borderColor={bookingInfoBorder}
             >
               <DetailItem icon={CalendarIcon} label="Date" value={booking.tour_date} />
               <DetailItem icon={TimeIcon} label="Time" value={booking.tour.tour_start_time} />
@@ -565,7 +577,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 )}
 
                 {!canceled &&(
-                  <Link href={route('tour.show', { tour: booking.tour.id, slug: booking.slug })}>
+                  <Link href={route('tour.show', { tour: booking.tour.id})}>
                     <Button {...secondaryButtonStyle} flexGrow={{base:1, sm:0}}>
                       {isUpcoming ? 'Tour Details' : 'Book Again'}
                     </Button>                
@@ -582,16 +594,16 @@ export default function Bookings( { user, transactions, flash} : Props ){
             </Flex>
             
             {!isUpcoming && booking.booking.tour_reviewed && !canceled && (
-              <Flex alignItems="center" mt={4} p={2} bg={useColorModeValue("green.50", "green.800")} borderRadius="md" borderLeft="3px solid" borderColor={useColorModeValue("green.500", "green.300")}>
-                  <Icon as={CheckCircleIcon} color={useColorModeValue("green.500", "green.300")} mr={2} />
-                  <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("green.700", "green.200")}>You've left a review for this tour.</Text>
+              <Flex alignItems="center" mt={4} p={2} bg={reviewNoticeBg} borderRadius="md" borderLeft="3px solid" borderColor={reviewNoticeBorder}>
+                  <Icon as={CheckCircleIcon} color={reviewNoticeIconColor} mr={2} />
+                  <Text fontSize="sm" fontWeight="medium" color={reviewNoticeTextColor}>You've left a review for this tour.</Text>
               </Flex>
             )}
             {!isUpcoming && booking.booking.tour_reviewed && !canceled && (
               <Flex alignItems="center" mt={booking.booking.tour_reviewed ? 2 : 4}>
                 <Text fontSize="sm" color={secondaryTextColor} mr={2}>Your Rating:</Text>
                 {[...Array(5)].map((_, i) => (
-                    <Icon key={i} as={StarIcon} color={i < TransactionTourReview[0].rating ? yellowStarColor : useColorModeValue("gray.300", "gray.600")} boxSize={4}/>
+                    <Icon key={i} as={StarIcon} color={i < TransactionTourReview[0].rating ? yellowStarColor : greyStarColor} boxSize={4}/>
                 ))}
                 <Text fontWeight="bold" fontSize="sm" ml={1.5} color={primaryTextColor}>
                     {TransactionTourReview[0].rating}/5
@@ -715,7 +727,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
                 bg={activeTabIndex === index ? primaryColor : 'transparent'}
                 boxShadow={activeTabIndex === index ? 'md' : 'none'}
                 transition="all 0.3s ease"
-                _hover={{ bg: activeTabIndex !== index ? useColorModeValue('blue.100', 'gray.700') : primaryHoverColor, color: activeTabIndex !== index ? primaryColor : 'white' }}
+                _hover={{ bg: activeTabIndex !== index ? TabHoverBg : primaryHoverColor, color: activeTabIndex !== index ? primaryColor : 'white' }}
                 _selected={{ color: 'white', bg: primaryColor, boxShadow: 'lg' }}
                 display="flex" alignItems="center" justifyContent="center"
               >
@@ -769,7 +781,8 @@ export default function Bookings( { user, transactions, flash} : Props ){
               <ModalBody py={6}>
                 <VStack spacing={5}>
                   <Text color={secondaryTextColor} fontWeight="medium">How was your experience?</Text>
-                  <HStack spacing={1} onMouseLeave={() => setHoverRating(0)}>
+                  <HStack spacing={1}>
+                  {/* <HStack spacing={1} onMouseLeave={() => setHoverRating(0)}> */}
                     {[...Array(5)].map((_, index) => {
                       const ratingValue = index + 1;
                       return (
@@ -777,7 +790,7 @@ export default function Bookings( { user, transactions, flash} : Props ){
                           key={ratingValue}
                           as={StarIcon}
                           boxSize={{base: 8, md: 10}}
-                          color={ratingValue <= (reviewData.rating || currentRating) ? yellowStarColor : grayStarColor}
+                          color={ratingValue <= (reviewData.rating || 0) ? yellowStarColor : grayStarColor}
                           onClick={() => setReviewData('rating', ratingValue)}
                           cursor="pointer"
                           transition="all 0.2s ease"

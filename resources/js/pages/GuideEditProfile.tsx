@@ -18,24 +18,14 @@ import {
   TagLabel,
   TagCloseButton,
   InputGroup,
-  InputRightElement,
   Divider,
   Select,
 } from '@chakra-ui/react';
-import { FiSave, FiUser, FiGlobe, FiAward, FiPlus } from 'react-icons/fi';
+import { FiSave, FiUser, FiGlobe, FiAward } from 'react-icons/fi';
 import GuideLayout from '../layouts/GuideLayout';
 import { useForm } from '@inertiajs/react';
 
 // --- DATA TIRUAN (MOCK DATA) UNTUK PROFIL PEMANDU YANG SEDANG LOGIN ---
-const initialGuideData = {
-  name: "Budi Hartono",
-  avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-  email: "budi.hartono@travelink.com",
-  about: "Saya adalah seorang pemandu wisata profesional dengan pengalaman lebih dari 5 tahun di Jakarta. Saya suka berbagi cerita tentang sejarah kota ini dan menunjukkan tempat-tempat tersembunyi yang menarik.",
-  languages: ['Indonesian', 'English'],
-  specialties: ['Sejarah', 'Kuliner', 'Wisata Kota'],
-  isVerified: true,
-};
 
 interface Language{
   id: number;
@@ -67,14 +57,10 @@ interface Props{
 export default function GuideEditProfile( { guide, languages, specialities }: Props ){
   const toast = useToast();
 
-  // console.log("PROPS RECEIVED FROM LARAVEL:", {guide});
-  // console.log("PROPS RECEIVED FROM LARAVEL:", {languages});
-  // console.log("PROPS RECEIVED FROM LARAVEL:", {specialities});
-
   const [languageToAdd, setLanguageToAdd] = useState<number | ''>('');
   const [specialityToAdd, setSpecialityToAdd] = useState<number | ''>('');
 
-  const { data, setData: setProfileData, patch, processing, errors, reset } = useForm({
+  const { data, setData: setProfileData, patch } = useForm({
     name: guide.name,
     email: guide.email,
     phone_number: guide.phone_number || '',
@@ -85,7 +71,7 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
   });
 
   const photoInput = useRef<HTMLInputElement>(null);
-  const { data: photoData, setData: setPhotoData, post, processing: photoProcessing, errors: photoErrors } = useForm({
+  const { data: photoData, setData: setPhotoData, post} = useForm({
       photo: null as File | null,
   });
 
@@ -94,41 +80,33 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
 
 
   const handleAddLanguage = () => {
-    // Ensure a language is selected and it's not already in the list
     if (languageToAdd && !data.languages.includes(Number(languageToAdd))) {
         setProfileData('languages', [...data.languages, Number(languageToAdd)]);
-        // Reset the dropdown
         setLanguageToAdd('');
     }
   };
 
   const handleRemoveLanguage = (idToRemove: number) => {
-    // Filter out the language with the matching ID
     const updatedLanguages = data.languages.filter((langId) => langId !== idToRemove);
     setProfileData('languages', updatedLanguages);
   };
 
-  // Unadded Languages
   const availableLanguages = languages.filter(
     (lang) => !data.languages.includes(lang.id)
   );
 
   const handleAddSpeciality = () => {
-    // Ensure a speciality is selected and it's not already in the list
     if (specialityToAdd && !data.specialities.includes(Number(specialityToAdd))) {
         setProfileData('specialities', [...data.specialities, Number(specialityToAdd)]);
-        // Reset the dropdown
         setSpecialityToAdd('');
     }
   };
 
   const handleRemoveSpeciality = (idToRemove: number) => {
-    // Filter out the language with the matching ID
     const updatedSpecialties = data.specialities.filter((specid) => specid !== idToRemove);
     setProfileData('specialities', updatedSpecialties);
   };
 
-  // Unadded Languages
   const availableSpeciality = specialities.filter(
     (spec) => !data.specialities.includes(spec.id)
   );
@@ -154,18 +132,8 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
-      setPhotoData('photo', e.target.files[0]), {
-        onSuccess: () => {
-          
-          toast({
-            title: "Profile picture Updated",
-            description: "Profile Picture Updated.",
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-      }
+      const photo = e.target.files[0];
+      setPhotoData('photo', photo);
     }
   }
 
@@ -187,7 +155,7 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
         }
       });
     }
-  }, [photoData.photo]);
+  }, [photoData.photo, toast, post]);
 
   const selectNewPhoto = () => {
     photoInput.current?.click();
@@ -263,14 +231,12 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
             {/* Skills & Specialties Section */}
             <Box bg={cardBg} p={6} borderRadius="lg" boxShadow="md">
               <VStack spacing={6} align="stretch">
-                {/* Languages */}
                 <Box>
                   <Heading size="lg" mb={4} display="flex" alignItems="center"><Icon as={FiGlobe} mr={3} /> Languages</Heading>
                   <HStack wrap="wrap" spacing={2} mb={4}>
                     {data.languages.map((langId) => {
-                        // Find the full language object from the ID
                         const language = languages.find(l => l.id === langId);
-                        if (!language) return null; // Or some fallback UI
+                        if (!language) return null;
 
                         return (
                             <Tag key={language.id} size="lg" colorScheme="blue" borderRadius="full">
@@ -287,7 +253,6 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
                       value={languageToAdd}
                       onChange={(e) => setLanguageToAdd(Number(e.target.value))}
                     >
-                      {/* Map over only the available languages */}
                       {availableLanguages.map((lang) => (
                           <option key={lang.id} value={lang.id}>
                               {lang.name}
@@ -327,7 +292,6 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
                       value={specialityToAdd}
                       onChange={(e) => setSpecialityToAdd(Number(e.target.value))}
                     >
-                      {/* Map over only the available languages */}
                       {availableSpeciality.map((spec) => (
                           <option key={spec.id} value={spec.id}>
                               {spec.name}
@@ -342,7 +306,6 @@ export default function GuideEditProfile( { guide, languages, specialities }: Pr
               </VStack>
             </Box>
 
-            {/* Form Actions */}
             <Flex justify="flex-end" py={4}>
               <Button
                 colorScheme="blue"

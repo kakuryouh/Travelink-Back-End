@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Flex,
@@ -10,12 +9,8 @@ import {
 } from '@chakra-ui/react';
 import { IconType } from 'react-icons';
 import { FiBriefcase, FiCalendar, FiArrowRight } from 'react-icons/fi';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import GuideLayout from '../layouts/GuideLayout'; 
-
-const guideData = {
-    name: "Budi Hartono",
-};
 
 const ActionCard = ({ title, description, icon, path }: {title: string, description: string, icon: IconType, path: string}) => {
     const bg = useColorModeValue('white', 'gray.800');

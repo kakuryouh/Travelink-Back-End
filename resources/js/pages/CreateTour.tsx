@@ -2,26 +2,14 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Flex, Text, Heading, useColorModeValue, Icon, VStack, HStack, Button,
   IconButton, FormControl, FormLabel, Input, Textarea, Select, NumberInput,
-  NumberInputField, SimpleGrid, useToast, Spinner, InputGroup, NumberDecrementStepper,
+  NumberInputField, SimpleGrid, useToast, InputGroup, NumberDecrementStepper,
   NumberIncrementStepper, NumberInputStepper, Tag, TagLabel, TagCloseButton, Image
 } from '@chakra-ui/react';
 import { FiPlus, FiTrash2, FiUploadCloud, FiArrowDown, FiArrowUp, FiX } from 'react-icons/fi';
-import { Link, router, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import GuideLayout from '../layouts/GuideLayout'; 
 
 // --- TYPE DEFINITIONS ---
-interface TourImage{
-  id: number;
-  image_path: string;
-  image_order: number;
-  image_caption: string;
-}
-
-interface TourImagePreview {
-  file: File;
-  previewUrl: string;
-  caption: string;
-}
 
 interface Tag{
   id: number;
@@ -49,15 +37,6 @@ interface DayPhase{
     description: string;
 }
 
-
-interface Itinerary{
-    id: number;
-    step_number: number;
-    start_time: string;
-    activity: string;
-    description: string;
-}
-
 interface Items{
     id: number;
     name: string;
@@ -66,32 +45,7 @@ interface Items{
     };
 }
 
-interface Tour{
-    id: number;
-    name: string;
-    tour_guide_id: number;
-    location: Location;
-    meeting_point: MeetingPoint;
-    tour_description: string;
-    tour_rating: number;
-    tour_review_count: number;
-    tour_price: number;
-    tour_duration: number;
-    dayphase: DayPhase;
-    featured: boolean;
-    tour_min_participants: number;
-    tour_max_participants: number;
-    tour_start_time: string;
-    slug: string;
-    categories: Category[];
-    images: TourImage[];
-    tags: Tag[];
-    itineraries: Itinerary[];
-    items: Items[];
-}
-
 interface Props{
-  tour: Tour;
   categories: Category[];
   dayphases: DayPhase[];
   meetingpoints: MeetingPoint[];
@@ -100,7 +54,7 @@ interface Props{
   items: Items[];
 }
 
-export default function CreateTour({ tour, categories, dayphases, meetingpoints, locations, tags, items  }:Props){
+export default function CreateTour({ categories, dayphases, meetingpoints, locations, tags, items }:Props){
     const toast = useToast();
 
     const [categoryToAdd, setCategoryToAdd] = useState<number | ''>('');
@@ -154,7 +108,7 @@ export default function CreateTour({ tour, categories, dayphases, meetingpoints,
     ];
 
     // 2. Initialize useForm with mapped values
-    const { data, setData: setEditTourData, post, processing, errors, reset } = useForm<TourFormData>({
+    const { data, setData: setEditTourData, post} = useForm<TourFormData>({
         name: '',
         tour_location_id: '',
         tour_meeting_point_id: '',
@@ -192,9 +146,8 @@ export default function CreateTour({ tour, categories, dayphases, meetingpoints,
     ); 
 
     useEffect(() => {
-    const payload = itinerary.map(({ uid, ...rest }) => rest);
-    setEditTourData('tour_itineraries', payload as any);
-    }, [itinerary]);
+    setEditTourData("tour_itineraries", itinerary);
+    }, [itinerary, setEditTourData]);
 
     const handleAddItineraryStep = () => {
     setItinerary(prev => {

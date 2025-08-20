@@ -1,12 +1,12 @@
 import React, { useState, FormEvent} from 'react';
 import {
   Box, Flex, Text, Button, Heading, Container, Grid,
-  useColorModeValue, Icon, VStack, HStack, Divider, useToast, Avatar
+  useColorModeValue, Icon, VStack, HStack, Divider
 } from '@chakra-ui/react';
 import {
   ArrowBackIcon, CheckCircleIcon, CalendarIcon, TimeIcon, InfoOutlineIcon
 } from '@chakra-ui/icons';
-import { Link, router, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 
 interface User{
   id: number;
@@ -43,9 +43,6 @@ interface Props{
 
 export default function Payment({ transaction, payment_methods }: Props){
 
-  // console.log('Laravel Input', transaction);
-
-  const toast = useToast();
   const [selectedMethod, setSelectedMethod] = useState('Credit Card');
   const [paymentMethodId, setPaymentMethodId] = useState(1);
   
@@ -60,6 +57,7 @@ export default function Payment({ transaction, payment_methods }: Props){
   const secondaryTextColor = useColorModeValue('gray.500', 'gray.400');
   const subtleBorderColor = useColorModeValue('gray.200', 'gray.700');
   const accentGradient = `linear(to-br, ${useColorModeValue('purple.400', 'purple.300')}, ${primaryColor})`;
+  const selectedMethodBg = useColorModeValue('blue.50', 'blue.800');
 
   const baseButtonStyle = {
     borderRadius: "lg", fontWeight: "semibold", h: "44px",
@@ -83,16 +81,6 @@ export default function Payment({ transaction, payment_methods }: Props){
     },
   };
 
-  const primaryButtonStyle = {
-    ...baseButtonStyle,
-    bgGradient: `linear(to-r, ${primaryColor}, ${useColorModeValue('blue.400', 'blue.300')})`,
-    color: 'white',
-    boxShadow: "md",
-    _hover: {
-      bgGradient: `linear(to-r, ${primaryHoverColor}, ${useColorModeValue('blue.500', 'blue.400')})`,
-      transform: 'translateY(-2px) scale(1.02)', boxShadow: 'lg'
-    },
-  };
   
   const secondaryButtonStyle = {
     ...baseButtonStyle, bg: 'transparent', color: primaryColor,
@@ -111,7 +99,7 @@ export default function Payment({ transaction, payment_methods }: Props){
     }).format(price);
   };
 
-  const {data, setData, post, processing, errors} = useForm({
+  const {setData, post, processing} = useForm({
     transaction_id: transaction.id,
     payment_method_id: paymentMethodId,
   });
@@ -252,7 +240,7 @@ export default function Payment({ transaction, payment_methods }: Props){
                     borderRadius="lg"
                     p={5}
                     cursor="pointer"
-                    bg={method.name === selectedMethod ? useColorModeValue('blue.50', 'blue.800') : cardBg}
+                    bg={method.name === selectedMethod ? selectedMethodBg : cardBg}
                     alignItems="center"
                     gap={4}
                     transition="all 0.2s ease"

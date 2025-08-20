@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Heading,
@@ -6,7 +6,6 @@ import {
   useColorModeValue,
   VStack,
   Button,
-  useToast,
   Divider,
   AlertDialog,
   AlertDialogBody,
@@ -18,13 +17,12 @@ import {
   Icon
 } from '@chakra-ui/react';
 import { FiAlertTriangle } from 'react-icons/fi';
-import { Link, router, useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import GuideLayout from '../layouts/GuideLayout';
 
 export default function GuideSettings(){
-  const toast = useToast();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const cancelRef = useRef<HTMLButtonElement>(null);
+  const cancelRef = useRef<HTMLButtonElement | null>(null);
 
   const handleLogOut = () => {
     const link = route('guide.logout');
@@ -32,7 +30,6 @@ export default function GuideSettings(){
   };
 
   const cardBg = useColorModeValue('white', 'gray.800');
-  const dangerZoneBg = useColorModeValue('red.50', 'red.900');
   const dangerZoneBorder = useColorModeValue('red.200', 'red.700');
   const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
 
@@ -73,10 +70,9 @@ export default function GuideSettings(){
         </VStack>
       </Box>
 
-      {/* Dialog Konfirmasi Hapus Akun */}
       <AlertDialog
         isOpen={isDeleteDialogOpen}
-        leastDestructiveRef={cancelRef as any}
+        leastDestructiveRef={cancelRef}
         onClose={() => setIsDeleteDialogOpen(false)}
       >
         <AlertDialogOverlay>

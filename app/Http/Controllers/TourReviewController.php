@@ -14,12 +14,12 @@ class TourReviewController extends Controller
     public function create(Request $request){
 
         $request->validate([
-            'transaction_id' => 'required|exists:transactions,id',
+            'transactionID' => 'required|exists:transactions,id',
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'required|string',
         ]);
 
-        $transaction_id = $request->input('transaction_id');
+        $transaction_id = $request->input('transactionID');
 
         $transaction = Transaction::with('booking', 'tour.reviews')->findOrFail($transaction_id);
         
