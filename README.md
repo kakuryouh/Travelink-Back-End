@@ -1,9 +1,9 @@
 # Travelink
 
 ## Group:
-## 1. 2602083316 - Nelson Nathanael (CEO) - (Front End)
-## 2. 2602068170 - Yodi Satria (CTO) - (Back End)
-## 3. 2602176686 - Rafif Adilfa Irdeva (COO) - (Front End)
+### 1. 2602083316 - Nelson Nathanael (CEO) - (Front End)
+### 2. 2602068170 - Yodi Satria (CTO) - (Back End)
+### 3. 2602176686 - Rafif Adilfa Irdeva (COO) - (Front End)
 
 ## Stack
 - **Laravel** (API + server-rendered Inertia responses)
