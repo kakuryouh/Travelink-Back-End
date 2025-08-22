@@ -119,14 +119,10 @@ class TransactionSeeder extends Seeder
 
                     // Tour Review
                     $tourRating = $tour->reviews()->avg('rating');
-
-                    $tour->increment('tour_review_count');
                     $tour->update(['tour_rating' => $tourRating]);
 
                     // Guide Review
                     $guideRating = $guide->reviews()->avg('rating');
-
-                    $guide->increment('review');
                     $guide->update(['rating' => $guideRating]);
 
 

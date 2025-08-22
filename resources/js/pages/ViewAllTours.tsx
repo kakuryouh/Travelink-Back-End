@@ -107,7 +107,6 @@ interface Tours{
   tour_price: number;
   tour_duration: number;
   featured: boolean;
-  slug: string;
   categories: Category[];
   images: TourImage[];
   tags: TourTag[];
@@ -427,7 +426,7 @@ export default function ViewAllTours({ user, tours }: Props){
                                         <Text fontSize="xs" color={secondaryTextColor}>{tour.tour_duration} Hours</Text>
                                     </HStack>
 
-                                    <LinkOverlay as={Link} href='/tours/${tour.id}'>
+                                    <LinkOverlay as={Link} href={route('tour.show', { tour: tour.id})}>
                                         <Heading size="md" color={primaryTextColor} fontWeight="bold" noOfLines={2} minH="3em" mb={2} _hover={{ color: primaryColor }} transition="color 0.2s">
                                             {tour.name}
                                         </Heading>
@@ -442,7 +441,7 @@ export default function ViewAllTours({ user, tours }: Props){
                                             <Text fontSize="xs" color={secondaryTextColor}>per person</Text>
                                         </Box>
 
-                                        <Link href={route('tour.show', { tour: tour.id, slug: tour.slug })}>
+                                        <Link href={route('tour.show', { tour: tour.id})}>
                                             <Button
                                                 {...primaryButtonStyle} size="sm" h="40px" px={5}
                                                 rightIcon={<ArrowForwardIcon />}

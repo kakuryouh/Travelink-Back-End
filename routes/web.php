@@ -48,7 +48,7 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::post('/profile/photo', [UserProfileController::class, 'updatePhoto'])->name('profile.photo.update');
     Route::get('dashboard', [DashboardController::class, 'view'])->name('dashboard.view');
     Route::get('ViewAllTour', [ViewAllTourController::class, 'view'])->name('Tours.view');
-    Route::get('/tours/{tour}}', [TourDetailController::class, 'show'])->name('tour.show');
+    Route::get('/tours/{tour}', [TourDetailController::class, 'show'])->name('tour.show');
     Route::get('Bookings', [BookingController::class, 'view'])->name('Bookings');
     Route::post('TourReview', [TourReviewController::class, 'create'])->name('TourReview.create');
     Route::get('/GuideProfile/{guide}', [GuideProfileController::class, 'user_view'])->name('guideprofile.userview');

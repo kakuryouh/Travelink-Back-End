@@ -8,6 +8,7 @@ import {
 } from '@chakra-ui/icons';
 import { keyframes } from '@emotion/react';
 import { Link } from '@inertiajs/react';
+import { text } from 'stream/consumers';
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -100,7 +101,6 @@ interface Tours{
   tour_price: number;
   tour_duration: number;
   dayphase: TourDayPhase;
-  slug: string;
 }
 
 interface Guide{
@@ -111,7 +111,7 @@ interface Guide{
   profile_picture: string;
   about: string;
   experience_years: number;
-  languages: Languages;
+  languages: Languages[];
   country: Country;
   specialities: Specialities[];
   tours: Tours[];
@@ -120,9 +120,10 @@ interface Guide{
 interface Props{
   user: User;
   guide: Guide;
+  languages: Languages[];
 }
 
-export default function GuideProfile({ user, guide }: Props){
+export default function GuideProfile({ user, guide, languages }: Props){
 
   const overallBg = useColorModeValue('blue.50', 'gray.900');
   const cardBg = useColorModeValue('white', 'gray.800');
@@ -260,8 +261,27 @@ export default function GuideProfile({ user, guide }: Props){
               <Grid templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)" }} gap={3} mb={4}>
                   <HStack bg={useColorModeValue('gray.50', 'gray.700')} p={2.5} borderRadius="md" borderLeft="3px solid" borderColor={primaryColor}>
                     <Icon as={ChatIcon} color={primaryColor} boxSize={4}/>
-                    <Text fontSize="sm" color={secondaryTextColor}><Text as="span" fontWeight="medium" color={primaryTextColor}>Languages:</Text> None </Text>
-                    {/* <Text fontSize="sm" color={secondaryTextColor}><Text as="span" fontWeight="medium" color={primaryTextColor}>Languages:</Text> {guide.languages.name.join(', ')}</Text> */}
+
+                    <Text fontSize="sm" color={secondaryTextColor}>
+                      <Text as="span" fontWeight="medium" color={primaryTextColor}>
+                        Languages:
+                      </Text>{" "}
+                      {guide.languages.slice(0, 3).map((langID, index) => {
+                        const language = languages.find(l => l.id === langID.id);
+                        if (!language) return null;
+
+                        return (
+                          <Text as="span" key={langID.id}>
+                            {language.name}
+                            {index < Math.min(guide.languages.length, 3) - 1 ? ", " : ""}
+                          </Text>
+                        );
+                      })}
+                      {guide.languages.length > 3 && (
+                        <Text as="span"> and {(guide.languages.length) - 3} more</Text>
+                      )}
+                    </Text>
+
                   </HStack>
                   <HStack bg={useColorModeValue('gray.50', 'gray.700')} p={2.5} borderRadius="md" borderLeft="3px solid" borderColor={primaryColor}>
                     <Icon as={TimeIcon} color={primaryColor} boxSize={4}/>
@@ -347,7 +367,7 @@ export default function GuideProfile({ user, guide }: Props){
                     <Text as="span" fontSize="xs" color={secondaryTextColor} fontWeight="normal"> /person</Text>
                   </Text>
 
-                  <Link href={route('tour.show', { tour: tour.id, slug: tour.slug })}>
+                  <Link href={route('tour.show', { tour: tour.id})}>
                     <Button
                       {...secondaryButtonStyle}
                       size="sm"

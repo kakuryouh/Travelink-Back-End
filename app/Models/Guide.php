@@ -29,6 +29,7 @@ class Guide extends Authenticatable
         'profile_picture',
         'about',
         'password',
+        'rating',
     ]; // specify the fillable attributes for mass assignment
 
     /**

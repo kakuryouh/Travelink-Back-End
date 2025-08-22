@@ -540,7 +540,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
               const coverImage = tour.images.find(image => image.image_order === 1);
 
               return(
-              <Link href={route('tour.show', { tour: tour.id, slug: tour.slug })}>
+              <Link href={route('tour.show', { tour: tour.id })}>
                 <Box
                   key={tour.id}
                   bg={cardBg}
@@ -555,7 +555,6 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                     borderColor: primaryColor,
                     transform: 'translateY(-6px) scale(1.01)',
                   }}
-                  // onClick={() => navigateTo(`/tours/${tour.id}`)}
                   animation={`${slideInUp} 0.6s ease-out ${index * 0.1}s both`}
                   role="group"
                 >
@@ -571,7 +570,7 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                     <Box position="absolute" top={0} left={0} right={0} bottom={0} bgGradient="linear(to-t, blackAlpha.700 15%, transparent 70%)" />
                     
                     <HStack position="absolute" top={4} left={4} spacing={2} wrap = "wrap"> 
-                      {tour.tags.slice(0,3).map((tag: TourTag) => ( // Using 'any' for now, can be a proper Tag interface
+                      {tour.tags.slice(0,3).map((tag: TourTag) => (
                         <Badge key={tag.id} variant="solid" bgGradient={accentGradient} color="white" mb={1} px={2.5} py={1} borderRadius="md" fontSize="xs" boxShadow="sm">{tag.name}</Badge>
                       ))}
                     </HStack>
@@ -590,9 +589,13 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                         <Text fontWeight="bold" color={primaryColor} fontSize="lg">{formatPrice(tour.tour_price)}</Text>
                         <Text fontSize="xs" color={secondaryTextColor}>per person</Text>
                       </Box>
-                      <Button {...primaryButtonStyle} size="sm" h="40px" px={5} onClick={(e) => { e.stopPropagation(); navigateTo(`/tours/${tour.id}`); }}>
+
+                      <Button
+                      {...primaryButtonStyle} 
+                      size="sm" h="40px" px={5}>
                         Book Now
                       </Button>
+
                     </Flex>
                   </Box>
                 </Box>
@@ -702,7 +705,6 @@ export default function Dashboard({ user, tours, featuredGuides, transactions}: 
                           <Text fontSize="2xs" color={secondaryTextColor}>({guide.total_tours} tours)</Text>
                         </HStack>
                       </Box>
-                      {/* <IconButton variant="ghost" colorScheme="blue" size="sm" onClick={(e) => { e.stopPropagation(); navigateTo(`/guides/${guide.id}/profile`); }} aria-label={`View profile of ${guide.name}`} icon={<ArrowForwardIcon boxSize={4.5} />} /> */}
                     </Flex>
                   </Box>
                 </Link>

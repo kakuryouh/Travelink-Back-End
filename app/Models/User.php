@@ -25,6 +25,8 @@ class User extends Authenticatable
         'language_id',
         'profile_photo_path',
         'password',
+        'review_count_guide',
+        'review_count_tour',
     ];
 
     /**

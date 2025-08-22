@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->foreignId('language_id')->nullable()->constrained('languages')->onDelete('set null');
             $table->integer('booking_count')->default(0);
-            $table->integer('review_count')->default(0);
+            $table->integer('review_count_guide')->default(0);
             $table->string('profile_photo_path', 2048)->nullable()->after('email');
             $table->string('password');
             $table->rememberToken();

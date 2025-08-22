@@ -125,15 +125,15 @@ export default function GuideAuth(){
         alignItems="center"
         justifyContent="center"
       >
-        {/* Gambar Background dari Aset Lokal */}
+
         <Box
             pos="absolute"
             top="0" left="0" right="0" bottom="0"
-            bgImage="public\guide-auth-bg.jpg" // <-- PERUBAHAN DI SINI
+            bgImage="/guide-auth-bg.jpg"
             bgSize="cover"
             bgPosition="center"
         />
-        {/* Overlay Gelap */}
+
         <Box
             pos="absolute"
             top="0" left="0" right="0" bottom="0"

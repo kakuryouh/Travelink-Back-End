@@ -47,8 +47,6 @@ class TourReviewController extends Controller
             $tour = $transaction->tour;
 
             $rating = $tour->reviews()->avg('rating');
-
-            $tour->increment('tour_review_count');
             $tour->update(['tour_rating' => $rating]);
 
             return back()->with('success', 'Tour Review Posted!');

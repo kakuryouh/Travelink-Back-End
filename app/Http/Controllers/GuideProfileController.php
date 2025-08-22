@@ -21,6 +21,7 @@ class GuideProfileController extends Controller
 
         return Inertia::render('GuideProfile', [
             'guide' => $guide,
+            'languages' => Language::all(),
             'user' => $user,
         ]);
     }

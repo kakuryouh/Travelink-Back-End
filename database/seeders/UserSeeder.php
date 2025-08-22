@@ -42,7 +42,8 @@ class UserSeeder extends Seeder
                 'phone_number' => '082112345678',
                 'language_id' => $language->id,
                 'booking_count' => 0,
-                'review_count' => 0,
+                'review_count_guide' => 0,
+                'review_count_tour' => 0,
                 'profile_photo_path' => "user-profile-photos/{$fileName}",
                 'password' => bcrypt('sarah123'),
             ]);
